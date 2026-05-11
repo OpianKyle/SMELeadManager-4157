@@ -1,0 +1,33 @@
+import { Route, Switch } from "wouter";
+import { Provider } from "./components/provider";
+import { AgentFeedback } from "@runablehq/website-runtime";
+import Index from "./pages/index";
+import SignIn from "./pages/sign-in";
+import Setup from "./pages/setup";
+import Dashboard from "./pages/dashboard";
+import Leads from "./pages/leads";
+import Workflow from "./pages/workflow";
+import EmailAutomation from "./pages/email-automation";
+import Users from "./pages/users";
+import Import from "./pages/import";
+
+function App() {
+  return (
+    <Provider>
+      <Switch>
+        <Route path="/" component={Index} />
+        <Route path="/sign-in" component={SignIn} />
+        <Route path="/setup" component={Setup} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/leads" component={Leads} />
+        <Route path="/import" component={Import} />
+        <Route path="/workflow" component={Workflow} />
+        <Route path="/email-automation" component={EmailAutomation} />
+        <Route path="/users" component={Users} />
+      </Switch>
+      {import.meta.env.DEV && <AgentFeedback />}
+    </Provider>
+  );
+}
+
+export default App;
