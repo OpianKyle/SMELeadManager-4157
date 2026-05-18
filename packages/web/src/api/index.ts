@@ -7,26 +7,11 @@ import { createAuth } from "./auth";
 import {
   stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper
 } from "./emails";
-import nodemailer from "nodemailer";
+import { sendEmail } from "./mailer";
+import { startAutomation, runAutomationTick } from "./automation";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || "465"),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
-
-async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  await transporter.sendMail({
-    from: `Masakhe Group <${process.env.SMTP_FROM}>`,
-    to,
-    subject,
-    html,
-  });
-}
+// Start the automation engine when the server loads
+startAutomation();
 
 type Variables = {
   user: typeof schema.user.$inferSelect | null;
@@ -367,6 +352,18 @@ app.put("/workflow/config", async (c) => {
     await db().insert(schema.workflowConfig).values({ id: "default", ...body });
   }
   return c.json({ success: true }, 200);
+});
+
+// ── Automation manual trigger ─────────────────────────────────────────
+app.post("/automation/run", async (c) => {
+  const err = requireRole(c, ["super_admin", "admin"]);
+  if (err) return err;
+  try {
+    await runAutomationTick();
+    return c.json({ success: true, message: "Automation tick completed" }, 200);
+  } catch (e: any) {
+    return c.json({ error: e?.message ?? "Automation failed" }, 500);
+  }
 });
 
 // ── Google Sheets proxy ───────────────────────────────────────────────
