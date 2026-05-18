@@ -1,0 +1,241 @@
+ubuntu@leads-manageer:~/SMELeadManager-4157$ cat package.json
+{
+  "name": "sandbox-app-template",
+  "private": true,
+  "packageManager": "bun@1.3.5",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "cd packages/web && bunx vite",
+    "dev:desktop": "cd packages/desktop && bunx vite",
+    "dev:mobile": "cd packages/mobile && bunx expo start",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "db:push": "turbo db:push",
+    "db:studio": "turbo db:studio"
+  },
+  "devDependencies": {
+    "@tursodatabase/api": "^1.9.2",
+    "@types/bun": "latest",
+    "@types/nodemailer": "^8.0.0",
+    "turbo": "^2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1023.0",
+    "@libsql/client": "^0.17.2",
+    "cloudflare": "^5.2.0",
+    "mysql2": "^3.22.3",
+    "nodemailer": "^8.0.7"
+  }
+}
+ubuntu@leads-manageer:~/SMELeadManager-4157$
+
+ubuntu@leads-manageer:~/SMELeadManager-4157$ ls packages/web
+README.md          node_modules  tsconfig.app.json   vite.config.ts
+components.json    package.json  tsconfig.json       website.config.json
+drizzle.config.ts  public        tsconfig.node.json
+index.html         src           vite
+ubuntu@leads-manageer:~/SMELeadManager-4157$
+
+
+Perfect — now everything is clear.
+
+🚨 ROOT CAUSE (confirmed)
+
+Your project is:
+
+❌ NOT a backend server
+❌ NOT a Node API
+✔ A Vite frontend (static SPA)
+
+Evidence:
+
+packages/web/index.html
+vite.config.ts
+bunx vite dev command
+NO server entry file (like server.ts, app.ts, etc.)
+💥 Why you are getting 502
+
+Your Nginx is currently doing this:
+
+HTTPS request → proxy_pass → localhost:5173 (or similar) → ❌ nothing running
+
+Because:
+
+👉 You never started Vite in production
+👉 PM2 is empty
+👉 There is no backend server at all
+
+🧠 Correct architecture for your app
+
+You currently have ONLY:
+
+Frontend (Vite React SPA)
+
+So production should be:
+
+Nginx → serves static files (NOT proxy_pass)
+
+NOT:
+
+Nginx → proxy_pass → backend (does not exist)
+🚀 FIX (this is the real solution)
+✅ STEP 1 — build the frontend
+cd packages/web
+bun install
+bun run build
+
+This creates:
+
+packages/web/dist
+❌ STEP 2 — REMOVE proxy_pass from Nginx
+
+Right now your config is wrong (this is causing 502).
+
+Open:
+
+sudo nano /etc/nginx/sites-available/masakhe-crm
+
+Replace EVERYTHING with:
+
+server {
+    listen 80;
+    server_name masakhemail.co.za;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name masakhemail.co.za;
+
+    ssl_certificate /etc/letsencrypt/live/masakhemail.co.za/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/masakhemail.co.za/privkey.pem;
+
+    root /home/ubuntu/SMELeadManager-4157/packages/web/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+🔄 STEP 3 — reload nginx
+sudo nginx -t
+sudo systemctl reload nginx
+🎯 STEP 4 — test
+curl -I https://masakhemail.co.za
+
+You should now get:
+
+200 OK
+
+NOT 502.
+
+⚠️ IMPORTANT INSIGHT
+
+You were trying to run it like a backend app, but:
+
+This is a STATIC FRONTEND (Vite SPA)
+
+So:
+
+❌ no PM2 needed
+❌ no Bun server needed
+❌ no proxy_pass needed
+
+Just:
+
+✔ build
+✔ serve via Nginx
+🧠 Why your setup broke
+
+You had:
+
+Nginx expecting a backend
+but only a frontend repo exists
+so everything pointed to nothing → 502
+🚀 If you want next level setup
+
+I can help you upgrade this to:
+
+Option A (recommended)
+Nginx + Vite static (what you should do now)
+Option B (enterprise)
+Add real backend (Bun API / Express / Fastify)
+PM2 process manager
+API + frontend separation
+proper CRM architecture
+
+If you want, I can also:
+👉 
+fix your Nginx file line-by-line
+👉 or 
+design your backend API structure for this CRM
+
+But for now:
+your 502 is 100% solved by removing proxy_pass and serving dist/
+
+but i do have a database connected
+
+Good — that actually makes sense, but it doesn’t change the core issue.
+
+🧠 Key point you need to separate
+
+A database connection is not a server
+
+Right now you have:
+
+✔ Frontend (Vite React app)
+✔ Database (MySQL / LibSQL / etc.)
+❌ No backend API server running
+
+So your system is currently:
+
+Browser → Nginx → (tries backend) → ❌ nothing → 502
+🚨 Important truth
+
+Even if your DB is perfectly connected in .env:
+
+👉 The browser CANNOT talk to the database directly
+👉 Something must sit in between
+
+That “something” is a backend API server
+
+Examples:
+
+Node (Express / Fastify)
+Bun server
+Next.js API routes
+Laravel / Django / etc.
+🧠 What you currently have
+
+From your repo:
+
+packages/web → frontend only
+mysql2, @libsql/client → database drivers exist
+BUT no running API process
+
+So your DB is like:
+
+Database ✔ (exists)
+Backend ❌ (missing)
+Frontend ✔ (exists)
+💥 Why your current setup is wrong
+
+You likely assumed:
+
+“If DB is connected, Nginx should work”
+
+But actually:
+
+👉 Nginx is failing because it expects a server at:
+
+localhost:PORT
+
+That server does NOT exist.
