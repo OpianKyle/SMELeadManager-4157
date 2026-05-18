@@ -12,13 +12,26 @@ const NAV = [
   { path: "/users", label: "User Management", icon: "🔐", roles: ["super_admin", "admin"] },
 ];
 
+const USER_CACHE_KEY = "masakhe_current_user";
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(() => {
+    try {
+      const cached = localStorage.getItem(USER_CACHE_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch { return null; }
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    api.get("/me").then(r => r.json()).then(d => setUser(d.user));
+    api.get("/me").then(r => r.json()).then(d => {
+      setUser(d.user);
+      try {
+        if (d.user) localStorage.setItem(USER_CACHE_KEY, JSON.stringify(d.user));
+        else localStorage.removeItem(USER_CACHE_KEY);
+      } catch {}
+    });
   }, []);
 
   // Close sidebar on route change (mobile)
@@ -153,19 +166,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {visibleNav.map(item => {
               const active = location.startsWith(item.path);
               return (
-                <Link key={item.path} href={item.path}>
-                  <a style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "11px 20px", fontSize: 14, fontWeight: active ? 600 : 400,
-                    color: active ? "#fff" : "rgba(255,255,255,0.55)",
-                    background: active ? "rgba(17,136,73,0.15)" : "transparent",
-                    borderLeft: active ? "3px solid #118849" : "3px solid transparent",
-                    textDecoration: "none", transition: "all 0.15s",
-                    cursor: "pointer",
-                  }}>
-                    <span style={{ fontSize: 16, minWidth: 20 }}>{item.icon}</span>
-                    {item.label}
-                  </a>
+                <Link key={item.path} href={item.path} style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "11px 20px", fontSize: 14, fontWeight: active ? 600 : 400,
+                  color: active ? "#fff" : "rgba(255,255,255,0.55)",
+                  background: active ? "rgba(17,136,73,0.15)" : "transparent",
+                  borderLeft: active ? "3px solid #118849" : "3px solid transparent",
+                  textDecoration: "none", transition: "all 0.15s",
+                  cursor: "pointer",
+                }}>
+                  <span style={{ fontSize: 16, minWidth: 20 }}>{item.icon}</span>
+                  {item.label}
                 </Link>
               );
             })}
