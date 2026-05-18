@@ -16,6 +16,7 @@ export default function Users() {
   const [editUser, setEditUser] = useState<any>(null);
   const [toast, setToast]     = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [form, setForm]       = useState({
     name: "", email: "", password: "", role: "viewer", phone: "", department: "", whatsappNumber: "",
   });
@@ -25,7 +26,13 @@ export default function Users() {
     api.get("/me").then(r => r.json()).then(d => setCurrentUser(d.user));
   }, []);
 
-  const load = () => api.get("/users").then(r => r.json()).then(d => setUsers(d.users ?? []));
+  const load = () => {
+    setFetching(true);
+    api.get("/users").then(r => r.json()).then(d => {
+      setUsers(d.users ?? []);
+      setFetching(false);
+    });
+  };
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
 
@@ -301,8 +308,21 @@ export default function Users() {
                 </tr>
               );
             })}
-            {users.length === 0 && (
-              <tr><td colSpan={8} style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
+            {fetching && users.length === 0 && (
+              <tr><td colSpan={9} style={{ padding: "40px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                  <div style={{
+                    width: 18, height: 18, border: "2px solid #d1d9e0",
+                    borderTopColor: "#192943", borderRadius: "50%",
+                    animation: "spin 0.7s linear infinite",
+                  }} />
+                  Loading users…
+                </div>
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+              </td></tr>
+            )}
+            {!fetching && users.length === 0 && (
+              <tr><td colSpan={9} style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
                 No users yet. Create the first user to get started.
               </td></tr>
             )}
