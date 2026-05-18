@@ -8,19 +8,21 @@ import honoDevPlugin from "./vite/plugins/hono-dev-plugin";
 const root = path.resolve(__dirname, "../..");
 
 export default defineConfig(({ mode }) => {
-	const env = loadEnv(mode, root, '');
-	Object.assign(process.env, env);
+        const env = loadEnv(mode, root, '');
+        Object.assign(process.env, env);
 
-	return {
-		plugins: [honoDevPlugin(), react(), runableAnalyticsPlugin(), tailwind()],
-		resolve: {
-			alias: {
-				"@": path.resolve(__dirname, "./src/web"),
-			},
-		},
-		server: {
-			allowedHosts: true,
-			hmr: { overlay: false, }
-		}
-	};
+        return {
+                plugins: [honoDevPlugin(), react(), runableAnalyticsPlugin(), tailwind()],
+                resolve: {
+                        alias: {
+                                "@": path.resolve(__dirname, "./src/web"),
+                        },
+                },
+                server: {
+                        host: "0.0.0.0",
+                        port: 5000,
+                        allowedHosts: true,
+                        hmr: { overlay: false, }
+                }
+        };
 });
