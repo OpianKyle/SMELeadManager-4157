@@ -1,0 +1,44 @@
+[TAILING] Tailing last 20 lines for [masakhe-crm] process (change the value with --lines option)
+/home/ubuntu/.pm2/logs/masakhe-crm-error.log last 20 lines:
+0|masakhe- |     at async link (internal/modules/esm/module_job.js:42:21)
+0|masakhe- | file:///home/ubuntu/SMELeadManager-4157/node_modules/.bun/vite@7.3.2+65c8ec4c556e91ee/node_modules/vite/bin/vite.js:51
+0|masakhe- |     module.enableCompileCache?.()
+0|masakhe- |                               ^
+0|masakhe- |
+0|masakhe- | SyntaxError: Unexpected token '.'
+0|masakhe- |     at Loader.moduleStrategy (internal/modules/esm/translators.js:133:18)
+0|masakhe- |     at async link (internal/modules/esm/module_job.js:42:21)
+0|masakhe- | file:///home/ubuntu/SMELeadManager-4157/node_modules/.bun/vite@7.3.2+65c8ec4c556e91ee/node_modules/vite/bin/vite.js:51
+0|masakhe- |     module.enableCompileCache?.()
+0|masakhe- |                               ^
+0|masakhe- |
+0|masakhe- | SyntaxError: Unexpected token '.'
+0|masakhe- |     at Loader.moduleStrategy (internal/modules/esm/translators.js:133:18)
+0|masakhe- |     at async link (internal/modules/esm/module_job.js:42:21)
+0|masakhe- | NODE_ENV=production is not supported in the .env file. Only NODE_ENV=development is supported to create a development build of your project. If you need to set process.env.NODE_ENV, you can set it in the Vite config instead.
+0|masakhe- | NODE_ENV=production is not supported in the .env file. Only NODE_ENV=development is supported to create a development build of your project. If you need to set process.env.NODE_ENV, you can set it in the Vite config instead.
+0|masakhe- | $ vite --host "0.0.0.0" --port "5173"
+0|masakhe- | NODE_ENV=production is not supported in the .env file. Only NODE_ENV=development is supported to create a development build of your project. If you need to set process.env.NODE_ENV, you can set it in the Vite config instead.
+0|masakhe- | $ vite --host "0.0.0.0" --port "5173"
+
+/home/ubuntu/.pm2/logs/masakhe-crm-out.log last 20 lines:
+0|masakhe- |   VITE v7.3.2  ready in 4069 ms
+0|masakhe- |
+0|masakhe- |   ➜  Local:   http://localhost:5174/
+0|masakhe- |   ➜  Network: http://154.65.111.228:5174/
+0|masakhe- |
+0|masakhe- |   VITE v7.3.2  ready in 2460 ms
+0|masakhe- |
+0|masakhe- |   ➜  Local:   http://localhost:5173/
+0|masakhe- |   ➜  Network: http://154.65.111.228:5173/
+0|masakhe- |
+0|masakhe- |   VITE v7.3.2  ready in 2484 ms
+0|masakhe- |
+0|masakhe- |   ➜  Local:   http://localhost:5173/
+0|masakhe- |   ➜  Network: http://154.65.111.228:5173/
+0|masakhe- | [automation] Engine started — ticking every 5 minutes
+0|masakhe- | [automation] Engine started — ticking every 5 minutes
+0|masakhe- | [server] Production server running on http://0.0.0.0:5000
+0|masakhe- | [automation] Engine started — ticking every 5 minutes
+0|masakhe- | [automation] Engine started — ticking every 5 minutes
+0|masakhe- | [server] Production server running on http://0.0.0.0:5000
