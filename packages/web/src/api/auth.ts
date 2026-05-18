@@ -6,7 +6,7 @@ import * as schema from "./database/schema";
 export const createAuth = (baseURL: string) =>
   betterAuth({
     database: drizzleAdapter(database, {
-      provider: "sqlite",
+      provider: "mysql",
       schema: {
         user: schema.user,
         session: schema.session,
@@ -27,4 +27,4 @@ export const createAuth = (baseURL: string) =>
   });
 
 // Static export for CLI schema generation
-export const auth = createAuth("http://localhost:4200");
+export const auth = createAuth("http://localhost:5000");

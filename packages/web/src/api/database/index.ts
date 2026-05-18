@@ -1,10 +1,15 @@
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import * as schema from "./schema";
 
-const client = createClient({
-  url: process.env.APP_DATABASE_URL || process.env.DATABASE_URL!,
-  authToken: process.env.APP_DATABASE_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN,
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: parseInt(process.env.DB_PORT || "3306"),
+  waitForConnections: true,
+  connectionLimit: 10,
 });
 
-export const database = drizzle(client, { schema });
+export const database = drizzle(pool, { schema, mode: "default" });

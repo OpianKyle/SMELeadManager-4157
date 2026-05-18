@@ -1,11 +1,14 @@
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "turso",
+  dialect: "mysql",
   schema: "./src/api/database/schema.ts",
   out: "./drizzle",
   dbCredentials: {
-    url: process.env.APP_DATABASE_URL || process.env.DATABASE_URL!,
-    authToken: process.env.APP_DATABASE_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN,
+    host: process.env.DB_HOST!,
+    user: process.env.DB_USER!,
+    password: process.env.DB_PASSWORD!,
+    database: process.env.DB_NAME!,
+    port: parseInt(process.env.DB_PORT || "3306"),
   },
 });
