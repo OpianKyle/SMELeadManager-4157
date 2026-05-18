@@ -179,12 +179,35 @@ app.get("/leads", async (c) => {
   return c.json({ leads }, 200);
 });
 
+async function maybeSendStage1(leadId: string) {
+  try {
+    const [cfg] = await db().select().from(schema.workflowConfig);
+    if (!cfg || (!cfg.stage1Auto && !cfg.autoMode)) return;
+    const [lead] = await db().select().from(schema.lead).where(eq(schema.lead.id, leadId));
+    if (!lead || lead.optedOut || lead.lastEmailAt) return;
+    const email = stage1Email(lead.name, lead.business ?? "");
+    await sendEmail({ to: lead.email, subject: email.subject, html: email.html });
+    await db().insert(schema.emailLog).values({
+      id: crypto.randomUUID(), leadId: lead.id, stage: "stage1",
+      subject: email.subject, sentBy: "auto", status: "sent",
+    });
+    await db().update(schema.lead)
+      .set({ lastEmailAt: new Date(), updatedAt: new Date() })
+      .where(eq(schema.lead.id, leadId));
+    console.log(`[automation] Stage 1 sent immediately to ${lead.email}`);
+  } catch (e: any) {
+    console.error(`[automation] Immediate stage 1 failed for lead ${leadId}:`, e.message);
+  }
+}
+
 app.post("/leads", async (c) => {
   const err = requireRole(c, ["super_admin", "admin", "agent"]);
   if (err) return err;
   const body = await c.req.json();
   const id = crypto.randomUUID();
   await db().insert(schema.lead).values({ id, ...body });
+  // Fire stage 1 immediately — don't await so the response is instant
+  maybeSendStage1(id);
   return c.json({ success: true, id }, 200);
 });
 
@@ -393,16 +416,20 @@ app.post("/leads/bulk", async (c) => {
     return c.json({ error: "leads array required" }, 400);
   }
   const results = { success: 0, failed: 0, errors: [] as string[] };
+  const createdIds: string[] = [];
   for (const lead of leads) {
     try {
       const id = crypto.randomUUID();
       await db().insert(schema.lead).values({ id, ...lead });
+      createdIds.push(id);
       results.success++;
     } catch (e: any) {
       results.failed++;
       results.errors.push(e?.message ?? "Unknown error");
     }
   }
+  // Fire stage 1 for all successfully created leads (non-blocking)
+  for (const id of createdIds) maybeSendStage1(id);
   return c.json(results, 200);
 });
 
