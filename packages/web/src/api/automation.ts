@@ -3,8 +3,25 @@ import { database } from "./database";
 import * as schema from "./database/schema";
 import { sendEmail } from "./mailer";
 import {
-  stage1Email, stage2Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper,
+  stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper,
 } from "./emails";
+
+function generateDemoSlots(from: Date): string[] {
+  const slots: string[] = [];
+  const times = ["10:00 AM", "2:00 PM", "4:00 PM"];
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let d = new Date(from);
+  d.setDate(d.getDate() + 1);
+  while (slots.length < 3) {
+    const dow = d.getUTCDay();
+    if (dow !== 0) { // skip Sunday
+      slots.push(`${days[dow]}, ${d.getUTCDate()} ${months[d.getUTCMonth()]} at ${times[slots.length]}`);
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return slots;
+}
 
 const TICK_INTERVAL_MS = 5 * 60 * 1000; // every 5 minutes
 
@@ -123,6 +140,85 @@ export async function runAutomationTick() {
           console.log(`[automation] Stage 2 sent to ${lead.email}`);
         } catch (e: any) {
           console.error(`[automation] Stage 2 failed for ${lead.email}:`, e.message);
+        }
+      }
+    }
+
+    // ── Stage 3 Auto (Demo Scheduling) ──────────────────────────────
+    // Send stage3 to leads in product_intro who haven't received it after followUpInterval
+    if (config.stage3Auto || config.autoMode) {
+      const intervalMs = (config.followUpInterval || 24) * 60 * 60 * 1000;
+      const cutoff = new Date(now.getTime() - intervalMs);
+
+      const stage3Candidates = await database
+        .select()
+        .from(schema.lead)
+        .where(
+          and(
+            eq(schema.lead.stage, "product_intro"),
+            eq(schema.lead.optedOut, false),
+            lt(schema.lead.lastEmailAt, cutoff),
+          )
+        );
+
+      for (const lead of stage3Candidates) {
+        const logs = await database
+          .select()
+          .from(schema.emailLog)
+          .where(eq(schema.emailLog.leadId, lead.id));
+        const stages = logs.map(l => l.stage);
+        if (!stages.includes("stage2") || stages.includes("stage3")) continue;
+
+        try {
+          // Generate 3 upcoming business-day slots relative to now
+          const slots = generateDemoSlots(now);
+          const email = stage3Email(lead.name, slots);
+          await sendEmail({ to: lead.email, subject: email.subject, html: email.html });
+          await database.insert(schema.emailLog).values({
+            id: crypto.randomUUID(), leadId: lead.id, stage: "stage3",
+            subject: email.subject, sentBy: "auto", status: "sent",
+          });
+          await database.update(schema.lead)
+            .set({ stage: "demo_scheduling", lastEmailAt: now, updatedAt: now })
+            .where(eq(schema.lead.id, lead.id));
+          console.log(`[automation] Stage 3 sent to ${lead.email}`);
+        } catch (e: any) {
+          console.error(`[automation] Stage 3 failed for ${lead.email}:`, e.message);
+        }
+      }
+    }
+
+    // ── Stage 5 Auto (Booking Confirmation) ──────────────────────────
+    // Send stage5 to booked leads who have demoDate+demoLink but no confirmation yet
+    if (config.stage5Auto || config.autoMode) {
+      const bookedConfirm = await database
+        .select()
+        .from(schema.lead)
+        .where(
+          and(
+            eq(schema.lead.stage, "booked"),
+            eq(schema.lead.optedOut, false),
+          )
+        );
+
+      for (const lead of bookedConfirm) {
+        if (!lead.demoDate || !lead.demoLink) continue;
+        const logs = await database
+          .select()
+          .from(schema.emailLog)
+          .where(eq(schema.emailLog.leadId, lead.id));
+        if (logs.some(l => l.stage === "stage5")) continue;
+
+        try {
+          const email = stage5Email(lead.name, lead.demoDate, lead.demoLink, "Masakhe Team");
+          await sendEmail({ to: lead.email, subject: email.subject, html: email.html });
+          await database.insert(schema.emailLog).values({
+            id: crypto.randomUUID(), leadId: lead.id, stage: "stage5",
+            subject: email.subject, sentBy: "auto", status: "sent",
+          });
+          console.log(`[automation] Stage 5 (booking confirmation) sent to ${lead.email}`);
+        } catch (e: any) {
+          console.error(`[automation] Stage 5 failed for ${lead.email}:`, e.message);
         }
       }
     }

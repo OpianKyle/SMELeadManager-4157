@@ -211,12 +211,35 @@ app.post("/leads", async (c) => {
   return c.json({ success: true, id }, 200);
 });
 
+async function maybeSendStage5(leadId: string) {
+  try {
+    const [cfg] = await db().select().from(schema.workflowConfig);
+    if (!cfg || (!cfg.stage5Auto && !cfg.autoMode)) return;
+    const [lead] = await db().select().from(schema.lead).where(eq(schema.lead.id, leadId));
+    if (!lead || lead.stage !== "booked" || !lead.demoDate || !lead.demoLink || lead.optedOut) return;
+    const logs = await db().select().from(schema.emailLog).where(eq(schema.emailLog.leadId, leadId));
+    if (logs.some(l => l.stage === "stage5")) return;
+    const { stage5Email } = await import("./emails");
+    const email = stage5Email(lead.name, lead.demoDate!, lead.demoLink!, "Masakhe Team");
+    await sendEmail({ to: lead.email, subject: email.subject, html: email.html });
+    await db().insert(schema.emailLog).values({
+      id: crypto.randomUUID(), leadId: lead.id, stage: "stage5",
+      subject: email.subject, sentBy: "auto", status: "sent",
+    });
+    console.log(`[automation] Stage 5 sent immediately to ${lead.email}`);
+  } catch (e: any) {
+    console.error(`[automation] Immediate stage 5 failed for lead ${leadId}:`, e.message);
+  }
+}
+
 app.put("/leads/:id", async (c) => {
   const err = requireRole(c, ["super_admin", "admin", "agent"]);
   if (err) return err;
   const id = c.req.param("id");
   const body = await c.req.json();
   await db().update(schema.lead).set({ ...body, updatedAt: new Date() }).where(eq(schema.lead.id, id));
+  // If lead is being marked as booked with demo details, fire stage 5 confirmation
+  if (body.stage === "booked") maybeSendStage5(id);
   return c.json({ success: true }, 200);
 });
 

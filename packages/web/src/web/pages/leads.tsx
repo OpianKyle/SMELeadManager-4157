@@ -822,7 +822,15 @@ export default function Leads() {
                       background: meta?.color ?? "#eef2f6", color: "#fff",
                     }}>{meta?.label ?? l.stage}</span>
                   </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#192943", textAlign: "center" }}>{l.followUpCount}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#192943", textAlign: "center" }}>
+                    {l.followUpCount}
+                    {l.followUpCount >= 3 && l.stage === "follow_up" && (
+                      <span style={{
+                        marginLeft: 6, padding: "2px 7px", borderRadius: 8, fontSize: 10,
+                        fontWeight: 700, background: "#dc2626", color: "#fff", verticalAlign: "middle",
+                      }}>Needs Human</span>
+                    )}
+                  </td>
                   <td style={{ padding: "12px 16px", fontSize: 12, color: "#5e708d" }}>{fmtShort(l.lastEmailAt)}</td>
                   <td style={{ padding: "12px 16px" }} onClick={e => e.stopPropagation()}>
                     {canEdit && (
@@ -878,6 +886,12 @@ export default function Leads() {
               <div className="lead-card-meta">
                 {l.phone && <span>📞 {l.phone}</span>}
                 <span>Follow-ups: {l.followUpCount}</span>
+                {l.followUpCount >= 3 && l.stage === "follow_up" && (
+                  <span style={{
+                    padding: "2px 7px", borderRadius: 8, fontSize: 10,
+                    fontWeight: 700, background: "#dc2626", color: "#fff",
+                  }}>Needs Human</span>
+                )}
                 {l.lastEmailAt && <span>Last email: {fmtShort(l.lastEmailAt)}</span>}
               </div>
               {canEdit && (
