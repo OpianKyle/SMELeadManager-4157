@@ -7,28 +7,25 @@ import { createAuth } from "./auth";
 import {
   stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper
 } from "./emails";
+import nodemailer from "nodemailer";
 
-// sendEmail via Resend
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || "465"),
+  secure: process.env.SMTP_SECURE === "true",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
+
 async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "Masakhe Group <support@masakhemail.co.za>",
-      to,
-      subject,
-      html,
-    }),
+  await transporter.sendMail({
+    from: `Masakhe Group <${process.env.SMTP_FROM}>`,
+    to,
+    subject,
+    html,
   });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Resend error ${res.status}: ${err}`);
-  }
-  return res.json();
 }
 
 type Variables = {

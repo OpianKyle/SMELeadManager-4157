@@ -19,6 +19,12 @@ DB_PORT = "3306"
 NODE_ENV = "development"
 WEBSITE_URL = "http://localhost:5000"
 BETTER_AUTH_SECRET = "masakhe-email-automation-replit-2026-secure"
+SMTP_FROM = "admin@masakhegroup.co.za"
+SMTP_HOST = "smtp.masakhegroup.co.za"
+SMTP_PORT = "465"
+SMTP_SECURE = "true"
+SMTP_USER = "admin@masakhegroup.co.za"
+SMTP_PASSWORD = "s49pE27Aq86975"
 
 [workflows]
 runButton = "Project"
