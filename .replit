@@ -44,5 +44,5 @@ externalPort = 80
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "cd packages/web && bunx vite preview --host 0.0.0.0 --port 5000"]
-build = ["bash", "-c", "cd packages/web && bun run build"]
+run = ["bash", "-c", "cd packages/web && bun run server.ts"]
+build = ["bash", "-c", "bun install && cd packages/web && bun run build"]
