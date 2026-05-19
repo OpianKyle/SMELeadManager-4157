@@ -1,3 +1,17 @@
+// Bun compatibility fix: mysql2's pool.query() calls Error.captureStackTrace with a plain
+// object, but Bun requires the first argument to be an actual Error instance. Patch it to
+// silently ignore that case so queries don't crash.
+const _origCaptureStackTrace = Error.captureStackTrace;
+if (typeof _origCaptureStackTrace === "function") {
+  (Error as any).captureStackTrace = (target: unknown, ...args: unknown[]) => {
+    try {
+      _origCaptureStackTrace(target as Error, ...(args as [Function?]));
+    } catch {
+      // silently ignore — happens when target is a plain object (mysql2 internal)
+    }
+  };
+}
+
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import * as schema from "./schema";
