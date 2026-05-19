@@ -41,6 +41,46 @@ function fmtShort(ts: number | string | Date | null | undefined) {
   return d.toLocaleDateString("en-ZA");
 }
 
+// ── vCard helpers ────────────────────────────────────────────────────
+function generateVCard(lead: any): string {
+  const nameParts = lead.name.trim().split(/\s+/);
+  const firstName = nameParts[0] ?? "";
+  const lastName = nameParts.slice(1).join(" ");
+  const lines = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `FN:${lead.name}`,
+    `N:${lastName};${firstName};;;`,
+    lead.business ? `ORG:${lead.business}` : null,
+    lead.email   ? `EMAIL;TYPE=WORK:${lead.email}` : null,
+    lead.phone   ? `TEL;TYPE=CELL:${lead.phone}` : null,
+    lead.notes   ? `NOTE:${String(lead.notes).replace(/\n/g, "\\n")}` : null,
+    "END:VCARD",
+  ].filter(Boolean).join("\r\n");
+  return lines;
+}
+
+function downloadVCard(lead: any) {
+  const blob = new Blob([generateVCard(lead)], { type: "text/vcard;charset=utf-8" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `${lead.name.replace(/[^a-zA-Z0-9]/g, "_")}.vcf`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadAllVCards(leads: any[]) {
+  const combined = leads.map(generateVCard).join("\r\n");
+  const blob = new Blob([combined], { type: "text/vcard;charset=utf-8" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = "all_leads.vcf";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ── Lead Drawer ──────────────────────────────────────────────────────
 function LeadDrawer({
   lead, user, onClose, onUpdate, onDelete,
@@ -205,11 +245,23 @@ function LeadDrawer({
               </div>
             )}
           </div>
-          <button onClick={onClose} style={{
-            background: "rgba(255,255,255,0.12)", border: "none", color: "#fff",
-            borderRadius: 4, width: 32, height: 32, fontSize: 18, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>×</button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+            <button
+              onClick={() => downloadVCard(lead)}
+              title="Download vCard (.vcf)"
+              style={{
+                background: "rgba(255,255,255,0.12)", border: "none", color: "#fff",
+                borderRadius: 4, padding: "0 12px", height: 32, fontSize: 12,
+                fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap",
+                display: "flex", alignItems: "center", gap: 5,
+              }}
+            >📇 vCard</button>
+            <button onClick={onClose} style={{
+              background: "rgba(255,255,255,0.12)", border: "none", color: "#fff",
+              borderRadius: 4, width: 32, height: 32, fontSize: 18, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>×</button>
+          </div>
         </div>
 
         {/* Body */}
@@ -751,13 +803,24 @@ export default function Leads() {
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#192943" }}>Lead Pipeline</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#5e708d" }}>{leads.length} total leads · tap a row to open CRM</p>
         </div>
-        {canEdit && (
-          <button onClick={() => setShowAdd(true)} style={{
-            background: "#118849", color: "#fff", border: "none", borderRadius: 3,
-            padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer",
-            fontFamily: "'Open Sans', Arial, sans-serif", whiteSpace: "nowrap",
-          }}>+ Add Lead</button>
-        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => downloadAllVCards(filtered)}
+            title="Download all visible leads as vCards"
+            style={{
+              background: "#5e708d", color: "#fff", border: "none", borderRadius: 3,
+              padding: "10px 16px", fontSize: 14, fontWeight: 700, cursor: "pointer",
+              fontFamily: "'Open Sans', Arial, sans-serif", whiteSpace: "nowrap",
+            }}
+          >📇 Download All</button>
+          {canEdit && (
+            <button onClick={() => setShowAdd(true)} style={{
+              background: "#118849", color: "#fff", border: "none", borderRadius: 3,
+              padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer",
+              fontFamily: "'Open Sans', Arial, sans-serif", whiteSpace: "nowrap",
+            }}>+ Add Lead</button>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -833,20 +896,31 @@ export default function Leads() {
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 12, color: "#5e708d" }}>{fmtShort(l.lastEmailAt)}</td>
                   <td style={{ padding: "12px 16px" }} onClick={e => e.stopPropagation()}>
-                    {canEdit && (
-                      <select
-                        onChange={e => { if (e.target.value) sendEmail(l.id, e.target.value); e.target.value = ""; }}
-                        disabled={!!sending || l.optedOut}
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      {canEdit && (
+                        <select
+                          onChange={e => { if (e.target.value) sendEmail(l.id, e.target.value); e.target.value = ""; }}
+                          disabled={!!sending || l.optedOut}
+                          style={{
+                            padding: "5px 8px", fontSize: 12, border: "1px solid #d1d9e0",
+                            borderRadius: 3, fontFamily: "'Open Sans',Arial,sans-serif",
+                            color: "#192943", cursor: "pointer", maxWidth: 160,
+                          }}
+                        >
+                          <option value="">Send Email…</option>
+                          {EMAIL_STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                        </select>
+                      )}
+                      <button
+                        onClick={() => downloadVCard(l)}
+                        title="Download vCard"
                         style={{
                           padding: "5px 8px", fontSize: 12, border: "1px solid #d1d9e0",
-                          borderRadius: 3, fontFamily: "'Open Sans',Arial,sans-serif",
-                          color: "#192943", cursor: "pointer", maxWidth: 160,
+                          borderRadius: 3, background: "#f0f3f7", color: "#192943",
+                          cursor: "pointer", whiteSpace: "nowrap",
                         }}
-                      >
-                        <option value="">Send Email…</option>
-                        {EMAIL_STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                      </select>
-                    )}
+                      >📇</button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -894,22 +968,30 @@ export default function Leads() {
                 )}
                 {l.lastEmailAt && <span>Last email: {fmtShort(l.lastEmailAt)}</span>}
               </div>
-              {canEdit && (
-                <div className="lead-card-actions" onClick={e => e.stopPropagation()}>
+              <div className="lead-card-actions" onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 8 }}>
+                {canEdit && (
                   <select
                     onChange={e => { if (e.target.value) sendEmail(l.id, e.target.value); e.target.value = ""; }}
                     disabled={!!sending || l.optedOut}
                     style={{
-                      padding: "7px 10px", fontSize: 13, border: "1px solid #d1d9e0",
+                      flex: 1, padding: "7px 10px", fontSize: 13, border: "1px solid #d1d9e0",
                       borderRadius: 3, fontFamily: "'Open Sans',Arial,sans-serif",
-                      color: "#192943", cursor: "pointer", width: "100%",
+                      color: "#192943", cursor: "pointer",
                     }}
                   >
                     <option value="">Send Email…</option>
                     {EMAIL_STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
-                </div>
-              )}
+                )}
+                <button
+                  onClick={() => downloadVCard(l)}
+                  title="Download vCard"
+                  style={{
+                    padding: "7px 12px", fontSize: 13, border: "1px solid #d1d9e0",
+                    borderRadius: 3, background: "#f0f3f7", color: "#192943", cursor: "pointer",
+                  }}
+                >📇</button>
+              </div>
             </div>
           );
         })}
