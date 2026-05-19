@@ -637,14 +637,69 @@ export default function Leads() {
   const [stageFilter, setStageFilter] = useState("all");
   const [selected, setSelected] = useState<any>(null);
   const [form, setForm]         = useState({ name: "", email: "", phone: "", business: "", source: "manual", notes: "" });
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleConfigured, setGoogleConfigured] = useState(false);
+  const [syncing, setSyncing]   = useState(false);
+  const [syncMsg, setSyncMsg]   = useState("");
+
+  const checkGoogleStatus = () =>
+    api.get("/google/status").then(r => r.json()).then(d => {
+      setGoogleConnected(d.connected);
+      setGoogleConfigured(d.configured);
+    }).catch(() => {});
 
   useEffect(() => {
     load();
     api.get("/me").then(r => r.json()).then(d => setUser(d.user));
+    checkGoogleStatus();
+
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === "google-auth-success") {
+        checkGoogleStatus();
+        showToast("Google Contacts connected!");
+      } else if (e.data?.type === "google-auth-error") {
+        showToast("Google connection failed. Please try again.");
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
   }, []);
 
   const load = () =>
     api.get("/leads").then(r => r.json()).then(d => setLeads(d.leads ?? []));
+
+  const connectGoogle = async () => {
+    const res = await api.get("/google/auth-url").then(r => r.json());
+    if (res.error) { showToast("Google not configured yet."); return; }
+    const popup = window.open(res.url, "google-auth", "width=500,height=600,left=200,top=100");
+    if (!popup) showToast("Please allow popups for this site.");
+  };
+
+  const disconnectGoogle = async () => {
+    await api.delete("/google/disconnect");
+    setGoogleConnected(false);
+    showToast("Google Contacts disconnected.");
+  };
+
+  const syncToGoogle = async () => {
+    if (syncing) return;
+    setSyncing(true);
+    setSyncMsg("");
+    try {
+      const leadIds = filtered.map((l: any) => l.id);
+      const res = await api.post("/google/sync", { leadIds }).then(r => r.json());
+      if (res.error === "not_connected") {
+        showToast("Connect Google Contacts first.");
+      } else {
+        setSyncMsg(`✓ ${res.created} synced${res.failed ? `, ${res.failed} failed` : ""}`);
+        setTimeout(() => setSyncMsg(""), 5000);
+      }
+    } catch {
+      showToast("Sync failed. Please try again.");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -803,7 +858,44 @@ export default function Leads() {
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#192943" }}>Lead Pipeline</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#5e708d" }}>{leads.length} total leads · tap a row to open CRM</p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          {syncMsg && (
+            <span style={{ fontSize: 13, color: "#118849", fontWeight: 600 }}>{syncMsg}</span>
+          )}
+          {googleConfigured && (
+            googleConnected ? (
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  onClick={syncToGoogle}
+                  disabled={syncing}
+                  title={`Sync ${filtered.length} visible leads to Google Contacts`}
+                  style={{
+                    background: "#4285f4", color: "#fff", border: "none", borderRadius: 3,
+                    padding: "10px 16px", fontSize: 14, fontWeight: 700, cursor: syncing ? "wait" : "pointer",
+                    fontFamily: "'Open Sans', Arial, sans-serif", whiteSpace: "nowrap", opacity: syncing ? 0.7 : 1,
+                  }}
+                >{syncing ? "Syncing…" : `🔄 Sync to Google (${filtered.length})`}</button>
+                <button
+                  onClick={disconnectGoogle}
+                  title="Disconnect Google Contacts"
+                  style={{
+                    background: "#fff", color: "#5e708d", border: "1px solid #d1d9e0", borderRadius: 3,
+                    padding: "10px 10px", fontSize: 13, cursor: "pointer",
+                    fontFamily: "'Open Sans', Arial, sans-serif",
+                  }}
+                >✕ Google</button>
+              </div>
+            ) : (
+              <button
+                onClick={connectGoogle}
+                style={{
+                  background: "#fff", color: "#192943", border: "1px solid #d1d9e0", borderRadius: 3,
+                  padding: "10px 16px", fontSize: 14, fontWeight: 700, cursor: "pointer",
+                  fontFamily: "'Open Sans', Arial, sans-serif", whiteSpace: "nowrap",
+                }}
+              >🔗 Connect Google Contacts</button>
+            )
+          )}
           <button
             onClick={() => downloadAllVCards(filtered)}
             title="Download all visible leads as vCards"

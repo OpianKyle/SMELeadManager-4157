@@ -120,6 +120,17 @@ export const whatsappLog = mysqlTable("whatsapp_log", {
   sentAt: timestamp("sent_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ── Google OAuth Tokens ──────────────────────────────────────────────
+export const googleToken = mysqlTable("google_token", {
+  userId: varchar("user_id", { length: 191 }).primaryKey().references(() => user.id, { onDelete: "cascade" }),
+  accessToken: text("access_token").notNull(),
+  refreshToken: text("refresh_token"),
+  expiresAt: timestamp("expires_at").notNull(),
+  scope: varchar("scope", { length: 512 }),
+  createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 // ── Workflow Config ──────────────────────────────────────────────────
 export const workflowConfig = mysqlTable("workflow_config", {
   id: varchar("id", { length: 50 }).primaryKey().default("default"),

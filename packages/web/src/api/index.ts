@@ -9,6 +9,7 @@ import {
 } from "./emails";
 import { sendEmail } from "./mailer";
 import { startAutomation, runAutomationTick } from "./automation";
+import googleRoutes from "./google";
 
 // Start the automation engine when the server loads
 startAutomation();
@@ -622,6 +623,8 @@ app.get("/leads/:id/whatsapp", async (c) => {
     .orderBy(desc(schema.whatsappLog.sentAt));
   return c.json({ logs });
 });
+
+app.route("/google", googleRoutes);
 
 export default app;
 export type AppType = typeof app;

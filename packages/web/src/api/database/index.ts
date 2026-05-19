@@ -23,7 +23,12 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   port: parseInt(process.env.DB_PORT || "3306"),
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 5,
+  // Keep connections alive so the shared MySQL host doesn't drop idle ones
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000,
+  // Reconnect automatically when a connection is lost
+  idleTimeout: 60000,
 });
 
 export const database = drizzle(pool, { schema, mode: "default" });
