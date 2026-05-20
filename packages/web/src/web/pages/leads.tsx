@@ -103,8 +103,9 @@ function LeadDrawer({
   const [waMsg, setWaMsg]         = useState("");
   const [waSending, setWaSending] = useState(false);
 
-  const canEdit   = user && ["super_admin", "admin", "agent"].includes(user.role);
-  const canDelete = user && ["super_admin", "admin"].includes(user.role);
+  const canEdit      = user && ["super_admin", "admin", "agent"].includes(user.role);
+  const canDelete    = user && ["super_admin", "admin"].includes(user.role);
+  const canWhatsApp  = user && ["super_admin", "admin"].includes(user.role);
 
   useEffect(() => {
     loadNotes();
@@ -449,7 +450,7 @@ function LeadDrawer({
 
           {/* WhatsApp */}
           <Section title={`WhatsApp${waLogs.length ? ` (${waLogs.length})` : ""}`}>
-            {canEdit && (
+            {canWhatsApp && (
               <button
                 onClick={() => setWaModal(true)}
                 style={{
