@@ -779,10 +779,17 @@ export default function Leads() {
           border-radius: 4px;
           box-shadow: 0 1px 4px rgba(0,0,0,0.07);
           overflow: hidden;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
         }
         .leads-table {
           width: 100%;
           border-collapse: collapse;
+          min-width: 900px;
+        }
+        .leads-table th,
+        .leads-table td {
+          white-space: nowrap;
         }
         .leads-cards {
           display: none;

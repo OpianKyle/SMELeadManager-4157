@@ -133,10 +133,12 @@ export default function Users() {
           border-radius: 4px;
           box-shadow: 0 1px 4px rgba(0,0,0,0.07);
           overflow: hidden;
-        }
-        .users-table-scroll {
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
+        }
+        .users-table-wrap table th,
+        .users-table-wrap table td {
+          white-space: nowrap;
         }
         @media (max-width: 900px) {
           .roles-grid {
