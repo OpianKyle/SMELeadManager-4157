@@ -778,8 +778,8 @@ export default function Leads() {
           background: #fff;
           border-radius: 4px;
           box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-          overflow: hidden;
           overflow-x: auto;
+          overflow-y: visible;
           -webkit-overflow-scrolling: touch;
         }
         .leads-table {

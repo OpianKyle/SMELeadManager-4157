@@ -88,7 +88,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         .hamburger-btn {
           display: none;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           .layout-sidebar {
             transform: translateX(-100%);
           }
@@ -99,7 +99,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             margin-left: 0;
           }
           .layout-content {
-            padding: 16px;
+            padding: 20px 24px;
           }
           .sidebar-overlay {
             display: block;
