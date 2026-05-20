@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, or, isNull, inArray, sql } from "drizzle-orm";
 import * as schema from "./database/schema";
 import { database } from "./database";
 import { createAuth } from "./auth";
@@ -13,6 +13,22 @@ import googleRoutes from "./google";
 
 // Start the automation engine when the server loads
 startAutomation();
+
+// ── DB migrations: ensure new columns exist ───────────────────────────
+async function runMigrations() {
+  const stmts = [
+    "ALTER TABLE `user` ADD COLUMN `manager_id` VARCHAR(191) NULL",
+    "ALTER TABLE `lead` ADD COLUMN `created_by` VARCHAR(191) NULL",
+  ];
+  for (const stmt of stmts) {
+    try {
+      await database.execute(sql.raw(stmt));
+    } catch (e: any) {
+      if (e?.code !== "ER_DUP_FIELDNAME") console.warn("[migration]", e?.message);
+    }
+  }
+}
+runMigrations();
 
 type Variables = {
   user: typeof schema.user.$inferSelect | null;
@@ -115,23 +131,34 @@ app.get("/me", (c) => {
 app.get("/users", async (c) => {
   const err = requireRole(c, ["super_admin", "admin"]);
   if (err) return err;
-  const users = await db().select().from(schema.user).orderBy(desc(schema.user.createdAt));
+  const u = c.get("user")!;
+  let users;
+  if (u.role === "admin") {
+    users = await db().select().from(schema.user)
+      .where(eq(schema.user.managerId, u.id))
+      .orderBy(desc(schema.user.createdAt));
+  } else {
+    users = await db().select().from(schema.user).orderBy(desc(schema.user.createdAt));
+  }
   return c.json({ users }, 200);
 });
 
 app.post("/users", async (c) => {
-  const err = requireRole(c, ["super_admin"]);
-  if (err) return err;
-  const { name, email, password, role, phone, department } = await c.req.json();
+  const currentUser = c.get("user")!;
+  const callerIsAdmin = currentUser.role === "admin";
+  const callerIsSuperAdmin = currentUser.role === "super_admin";
+  if (!callerIsAdmin && !callerIsSuperAdmin) return c.json({ error: "Forbidden" }, 403);
+  const { name, email, password, role, phone, department, whatsappNumber } = await c.req.json();
   if (!name || !email || !password) return c.json({ error: "name, email, password required" }, 400);
-
+  const assignedRole = callerIsAdmin ? "agent" : (role ?? "viewer");
+  const managerId = callerIsAdmin ? currentUser.id : null;
   const baseURL = new URL(c.req.url).origin;
   const auth = createAuth(baseURL);
   try {
     const result = await auth.api.signUpEmail({ body: { name, email, password } });
     if (result?.user?.id) {
       await db().update(schema.user)
-        .set({ role: role ?? "viewer", phone, department })
+        .set({ role: assignedRole as any, phone, department, whatsappNumber, ...(managerId ? { managerId } : {}) })
         .where(eq(schema.user.id, result.user.id));
     }
     return c.json({ success: true, userId: result?.user?.id }, 200);
@@ -176,8 +203,33 @@ app.delete("/users/:id", async (c) => {
 app.get("/leads", async (c) => {
   const err = requireAuth(c);
   if (err) return err;
-  const leads = await db().select().from(schema.lead).orderBy(desc(schema.lead.createdAt));
-  return c.json({ leads }, 200);
+  const u = c.get("user")!;
+
+  const allUsers = await db()
+    .select({ id: schema.user.id, name: schema.user.name, managerId: schema.user.managerId })
+    .from(schema.user);
+  const userMap = new Map(allUsers.map(au => [au.id, au.name]));
+
+  let leads;
+  if (u.role === "agent") {
+    leads = await db().select().from(schema.lead)
+      .where(eq(schema.lead.createdBy, u.id))
+      .orderBy(desc(schema.lead.createdAt));
+  } else if (u.role === "admin") {
+    const agentIds = allUsers.filter(au => au.managerId === u.id).map(au => au.id);
+    const allowedIds = [u.id, ...agentIds];
+    leads = await db().select().from(schema.lead)
+      .where(or(isNull(schema.lead.createdBy), inArray(schema.lead.createdBy, allowedIds)))
+      .orderBy(desc(schema.lead.createdAt));
+  } else {
+    leads = await db().select().from(schema.lead).orderBy(desc(schema.lead.createdAt));
+  }
+
+  const leadsWithCreator = leads.map(l => ({
+    ...l,
+    createdByName: l.createdBy ? (userMap.get(l.createdBy) ?? null) : null,
+  }));
+  return c.json({ leads: leadsWithCreator }, 200);
 });
 
 async function maybeSendStage1(leadId: string) {
@@ -204,9 +256,10 @@ async function maybeSendStage1(leadId: string) {
 app.post("/leads", async (c) => {
   const err = requireRole(c, ["super_admin", "admin", "agent"]);
   if (err) return err;
+  const u = c.get("user")!;
   const body = await c.req.json();
   const id = crypto.randomUUID();
-  await db().insert(schema.lead).values({ id, ...body });
+  await db().insert(schema.lead).values({ id, createdBy: u.id, ...body });
   // Fire stage 1 immediately — don't await so the response is instant
   maybeSendStage1(id);
   return c.json({ success: true, id }, 200);
@@ -439,12 +492,13 @@ app.post("/leads/bulk", async (c) => {
   if (!Array.isArray(leads) || leads.length === 0) {
     return c.json({ error: "leads array required" }, 400);
   }
+  const u = c.get("user")!;
   const results = { success: 0, failed: 0, errors: [] as string[] };
   const createdIds: string[] = [];
   for (const lead of leads) {
     try {
       const id = crypto.randomUUID();
-      await db().insert(schema.lead).values({ id, ...lead });
+      await db().insert(schema.lead).values({ id, createdBy: u.id, ...lead });
       createdIds.push(id);
       results.success++;
     } catch (e: any) {

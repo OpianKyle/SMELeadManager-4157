@@ -78,6 +78,7 @@ export default function Users() {
   };
 
   const isSuperAdmin = currentUser?.role === "super_admin";
+  const isAdmin = currentUser?.role === "admin";
 
   const FIELD = (label: string, key: string, type = "text", placeholder = "") => (
     <div style={{ marginBottom: 16 }}>
@@ -173,12 +174,15 @@ export default function Users() {
             Permission-based user profiles and access control
           </p>
         </div>
-        {isSuperAdmin && (
-          <button onClick={() => setShowAdd(true)} style={{
+        {(isSuperAdmin || isAdmin) && (
+          <button onClick={() => {
+            setForm(p => ({ ...p, role: isAdmin ? "agent" : p.role }));
+            setShowAdd(true);
+          }} style={{
             background: "#118849", color: "#fff", border: "none", borderRadius: 3,
             padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer",
             fontFamily: "'Open Sans',Arial,sans-serif", whiteSpace: "nowrap",
-          }}>+ Create User</button>
+          }}>{isAdmin ? "+ Create Agent" : "+ Create User"}</button>
         )}
       </div>
 
@@ -359,7 +363,7 @@ export default function Users() {
                 <div style={{ marginBottom: 20 }}>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#192943", marginBottom: 8 }}>Role & Permissions *</label>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {ROLES.map(r => (
+                    {(isAdmin ? ROLES.filter(r => r.value === "agent") : ROLES).map(r => (
                       <label key={r.value} style={{
                         display: "flex", alignItems: "flex-start", gap: 10,
                         padding: "12px 14px", border: `2px solid ${form.role === r.value ? r.color : "#eef2f6"}`,

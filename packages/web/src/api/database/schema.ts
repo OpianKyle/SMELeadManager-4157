@@ -15,6 +15,7 @@ export const user = mysqlTable("user", {
   phone: varchar("phone", { length: 50 }),
   department: varchar("department", { length: 255 }),
   whatsappNumber: varchar("whatsapp_number", { length: 50 }),
+  managerId: varchar("manager_id", { length: 191 }),
 });
 
 export const session = mysqlTable("session", {
@@ -63,6 +64,7 @@ export const lead = mysqlTable("lead", {
   source: varchar("source", { length: 100 }).default("manual"),
   stage: mysqlEnum("stage", ["initial_contact", "product_intro", "demo_scheduling", "follow_up", "booked", "completed", "opted_out"]).notNull().default("initial_contact"),
   assignedTo: varchar("assigned_to", { length: 191 }).references(() => user.id),
+  createdBy: varchar("created_by", { length: 191 }),
   notes: text("notes"),
   followUpCount: int("follow_up_count").notNull().default(0),
   demoDate: varchar("demo_date", { length: 100 }),

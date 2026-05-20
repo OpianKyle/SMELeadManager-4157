@@ -737,6 +737,7 @@ export default function Leads() {
 
   const canEdit = user && ["super_admin", "admin", "agent"].includes(user.role);
   const canDelete = user && ["super_admin", "admin"].includes(user.role);
+  const showCreatedBy = user && ["super_admin", "admin"].includes(user.role);
 
   const filtered = leads.filter(l => {
     const q = search.toLowerCase();
@@ -941,7 +942,7 @@ export default function Leads() {
         <table className="leads-table">
           <thead>
             <tr style={{ background: "#192943" }}>
-              {["Name", "Business", "Email", "Phone", "Stage", "Follow-ups", "Last Email", "Actions"].map(h => (
+              {["Name", "Business", "Email", "Phone", "Stage", "Follow-ups", "Last Email", ...(showCreatedBy ? ["Created By"] : []), "Actions"].map(h => (
                 <th key={h} style={{
                   padding: "12px 16px", textAlign: "left", fontSize: 11,
                   fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: "1px",
@@ -987,6 +988,11 @@ export default function Leads() {
                     )}
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 12, color: "#5e708d" }}>{fmtShort(l.lastEmailAt)}</td>
+                  {showCreatedBy && (
+                    <td style={{ padding: "12px 16px", fontSize: 12, color: "#5e708d" }}>
+                      {l.createdByName ?? <span style={{ color: "#ccc" }}>—</span>}
+                    </td>
+                  )}
                   <td style={{ padding: "12px 16px" }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       {canEdit && (
@@ -1018,7 +1024,7 @@ export default function Leads() {
               );
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={8} style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
+              <tr><td colSpan={showCreatedBy ? 9 : 8} style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
                 No leads found. Add your first lead to get started.
               </td></tr>
             )}
