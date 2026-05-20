@@ -1,3 +1,6 @@
+// Branded HTML email templates for Masakhe Email Automation
+// WhatsApp CTA +27 81 038 3955 on every email
+
 const WA_NUMBER = "27810383955";
 const WA_LINK = `https://wa.me/${WA_NUMBER}`;
 
@@ -15,7 +18,7 @@ export function emailWrapper(content: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email</title>
+  <title>Masakhe Group</title>
 </head>
 <body style="${baseStyle}">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; padding: 32px 0;">
@@ -27,6 +30,11 @@ export function emailWrapper(content: string): string {
           <td style="background:#0f326b; padding:24px 32px;">
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
+                <td>
+                  <span style="font-family:'Open Sans',Arial,sans-serif; font-size:22px; font-weight:900; color:#ffffff; letter-spacing:-0.5px;">
+                    M <span style="font-weight:400;">Masakhe</span> <span style="color:#118849; font-weight:700;">Group</span>
+                  </span>
+                </td>
                 <td align="right">
                   <span style="font-family:'Open Sans',Arial,sans-serif; font-size:11px; color:rgba(255,255,255,0.6); letter-spacing:1px; text-transform:uppercase;">
                     Empowering SA Businesses Digitally
@@ -92,7 +100,7 @@ export function emailWrapper(content: string): string {
               <tr>
                 <td>
                   <p style="font-family:'Open Sans',Arial,sans-serif; font-size:12px; color:rgba(255,255,255,0.5); margin:0 0 4px 0;">
-                    © 2026 All rights reserved.
+                    © 2026 Masakhe Group (Pty) Ltd. All rights reserved.
                   </p>
                   <p style="font-family:'Open Sans',Arial,sans-serif; font-size:12px; color:rgba(255,255,255,0.4); margin:0 0 8px 0;">
                     260 Uys Krige Drive, Loevenstein, South Africa · hello@masakhegroup.co.za · +27 (0)810383955
@@ -124,7 +132,7 @@ export function stage1Email(name: string, business: string) {
     subject: `👋 Hi ${name} — Let's Help ${business || "Your Business"} Grow`,
     html: emailWrapper(`
       <div style="background:#0f326b; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
-        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">Welcome to SME BUILDER</p>
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">Welcome to Masakhe SME BUILDER</p>
       </div>
 
       <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
@@ -183,7 +191,7 @@ export function stage2Email(name: string, business: string) {
   ];
 
   return {
-    subject: `${name}, here's everything the Platform does for your business`,
+    subject: `${name}, here's everything the Masakhe Platform does for your business`,
     html: emailWrapper(`
       <div style="background:#0f326b; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
         <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">One Platform. Everything Your Business Needs.</p>
@@ -193,7 +201,7 @@ export function stage2Email(name: string, business: string) {
         Hi <strong>${name}</strong>,
       </p>
       <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 20px 0;">
-        The <strong>SME BUILDER</strong> replaces multiple expensive tools with one affordable monthly platform. Here's what's included:
+        The <strong>Masakhe SME BUILDER</strong> replaces multiple expensive tools with one affordable monthly platform. Here's what's included:
       </p>
 
       <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
@@ -243,7 +251,7 @@ export function stage3Email(name: string, slots: string[]) {
       </table>
 
       <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#5e708d; margin:0;">
-        📍 Format: Google Meet (link sent upon confirmation) &nbsp;·&nbsp; 🕐 Duration: 20 minutes
+        📍 Format: Google Meet (link sent upon confirmation) &nbsp;·&nbsp; 🕐 Duration: 20 minutes &nbsp;·&nbsp; 👤 With: Masakhe Team
       </p>
     `),
   };
@@ -255,12 +263,12 @@ export function stage4Email(name: string, followUpNum: 1 | 2 | 3) {
     1: {
       subject: `Hi ${name} — just checking in 👋`,
       headline: "Still Interested in Growing Your Business?",
-      body: `I wanted to follow up on my previous email about the <strong>SME BUILDER</strong>. I know things get busy, but I don't want you to miss out on how much simpler running your business can be.`,
+      body: `I wanted to follow up on my previous email about the <strong>Masakhe SME BUILDER</strong>. I know things get busy, but I don't want you to miss out on how much simpler running your business can be.`,
     },
     2: {
       subject: `${name}, your free trial window is closing`,
       headline: "Save x10 Time & x10 Cost — Starting Today",
-      body: `South African businesses using the <strong>SME BUILDER</strong> save hours every week on admin tasks. With your <strong>free 7-day trial</strong> available, there's nothing to lose. Let's get you set up before you miss the window.`,
+      body: `South African businesses using the Masakhe SME BUILDER save hours every week on admin tasks. With your <strong>free 7-day trial</strong> available, there's nothing to lose. Let's get you set up before you miss the window.`,
     },
     3: {
       subject: `Final follow-up, ${name} — let's connect`,
@@ -301,7 +309,7 @@ export function stage5Email(name: string, demoDate: string, meetLink: string, ag
         Hi <strong>${name}</strong>,
       </p>
       <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 20px 0;">
-        Your free SME BUILDER demo is booked. We're looking forward to showing you everything the platform can do for your business.
+        Your free Masakhe SME BUILDER demo is booked. We're looking forward to showing you everything the platform can do for your business.
       </p>
 
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
@@ -327,7 +335,7 @@ export function stage5Email(name: string, demoDate: string, meetLink: string, ag
         <tr>
           <td style="padding:8px 0;">
             <span style="font-family:'Open Sans',Arial,sans-serif; font-size:13px; color:#5e708d; display:block; margin-bottom:2px;">👤 Your Host</span>
-            <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943;">${agentName}</strong>
+            <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943;">${agentName}, Masakhe Team</strong>
           </td>
         </tr>` : ""}
       </table>
@@ -356,14 +364,14 @@ export function stage5Email(name: string, demoDate: string, meetLink: string, ag
 // ── Demo Reminder (24h or 1h before) ─────────────────────────────────
 export function demoReminderEmail(name: string, demoDate: string, meetLink: string, hoursAhead: 24 | 1) {
   return {
-    subject: `⏰ Reminder: Your demo is ${hoursAhead === 24 ? "tomorrow" : "in 1 hour"}, ${name}`,
+    subject: `⏰ Reminder: Your Masakhe demo is ${hoursAhead === 24 ? "tomorrow" : "in 1 hour"}, ${name}`,
     html: emailWrapper(`
       <div style="background:#0f326b; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
         <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">⏰ Your Demo is ${hoursAhead === 24 ? "Tomorrow" : "Starting in 1 Hour"}</p>
       </div>
 
       <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
-        Hi <strong>${name}</strong>, just a quick reminder about your upcoming demo.
+        Hi <strong>${name}</strong>, just a quick reminder about your upcoming Masakhe demo.
       </p>
 
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
