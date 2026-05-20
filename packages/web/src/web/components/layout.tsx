@@ -75,7 +75,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         }
         .layout-main {
           margin-left: 240px;
-          flex: 1;
+          min-width: 0;
+          flex: 1 1 0%;
           background: #eef2f6;
           min-height: 100vh;
         }

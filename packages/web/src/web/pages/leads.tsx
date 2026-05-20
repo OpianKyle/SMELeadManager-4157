@@ -778,14 +778,13 @@ export default function Leads() {
           background: #fff;
           border-radius: 4px;
           box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-          overflow-x: auto;
-          overflow-y: visible;
+          overflow: auto;
           -webkit-overflow-scrolling: touch;
         }
         .leads-table {
-          width: 100%;
+          width: max-content;
+          min-width: 100%;
           border-collapse: collapse;
-          min-width: 900px;
         }
         .leads-table th,
         .leads-table td {

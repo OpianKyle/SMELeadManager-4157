@@ -132,8 +132,7 @@ export default function Users() {
           background: #fff;
           border-radius: 4px;
           box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-          overflow-x: auto;
-          overflow-y: visible;
+          overflow: auto;
           -webkit-overflow-scrolling: touch;
         }
         .users-table-wrap table th,
