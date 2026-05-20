@@ -951,8 +951,8 @@ export default function Leads() {
             <tr style={{ background: "#192943" }}>
               {["Name", "Business", "Email", "Phone", "Stage", "Follow-ups", "Last Email", ...(showCreatedBy ? ["Created By"] : []), "Actions"].map(h => (
                 <th key={h} style={{
-                  padding: "12px 16px", textAlign: "left", fontSize: 11,
-                  fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: "1px",
+                  padding: "9px 10px", textAlign: "left", fontSize: 10,
+                  fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: "0.8px",
                   textTransform: "uppercase",
                 }}>{h}</th>
               ))}
@@ -975,32 +975,32 @@ export default function Leads() {
                   onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "#f5f8ff"; }}
                   onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? "#fff" : "#fafbfc"; }}
                 >
-                  <td style={{ padding: "12px 16px", fontSize: 14, fontWeight: 600, color: "#192943" }}>{l.name}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#5e708d" }}>{l.business ?? "—"}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#5e708d" }}>{l.email}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#5e708d" }}>{l.phone ?? "—"}</td>
-                  <td style={{ padding: "12px 16px" }}>
+                  <td style={{ padding: "8px 10px", fontSize: 12, fontWeight: 600, color: "#192943" }}>{l.name}</td>
+                  <td style={{ padding: "8px 10px", fontSize: 12, color: "#5e708d" }}>{l.business ?? "—"}</td>
+                  <td style={{ padding: "8px 10px", fontSize: 12, color: "#5e708d" }}>{l.email}</td>
+                  <td style={{ padding: "8px 10px", fontSize: 12, color: "#5e708d" }}>{l.phone ?? "—"}</td>
+                  <td style={{ padding: "8px 10px" }}>
                     <span style={{
-                      padding: "3px 10px", borderRadius: 10, fontSize: 11, fontWeight: 700,
+                      padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 700,
                       background: meta?.color ?? "#eef2f6", color: "#fff",
                     }}>{meta?.label ?? l.stage}</span>
                   </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#192943", textAlign: "center" }}>
+                  <td style={{ padding: "8px 10px", fontSize: 12, color: "#192943", textAlign: "center" }}>
                     {l.followUpCount}
                     {l.followUpCount >= 3 && l.stage === "follow_up" && (
                       <span style={{
-                        marginLeft: 6, padding: "2px 7px", borderRadius: 8, fontSize: 10,
+                        marginLeft: 4, padding: "1px 6px", borderRadius: 8, fontSize: 10,
                         fontWeight: 700, background: "#dc2626", color: "#fff", verticalAlign: "middle",
                       }}>Needs Human</span>
                     )}
                   </td>
-                  <td style={{ padding: "12px 16px", fontSize: 12, color: "#5e708d" }}>{fmtShort(l.lastEmailAt)}</td>
+                  <td style={{ padding: "8px 10px", fontSize: 12, color: "#5e708d" }}>{fmtShort(l.lastEmailAt)}</td>
                   {showCreatedBy && (
-                    <td style={{ padding: "12px 16px", fontSize: 12, color: "#5e708d" }}>
+                    <td style={{ padding: "8px 10px", fontSize: 12, color: "#5e708d" }}>
                       {l.createdByName ?? <span style={{ color: "#ccc" }}>—</span>}
                     </td>
                   )}
-                  <td style={{ padding: "12px 16px" }} onClick={e => e.stopPropagation()}>
+                  <td style={{ padding: "8px 10px" }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       {canEdit && (
                         <select
