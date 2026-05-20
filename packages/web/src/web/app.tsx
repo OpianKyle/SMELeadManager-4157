@@ -10,6 +10,7 @@ import Workflow from "./pages/workflow";
 import EmailAutomation from "./pages/email-automation";
 import Users from "./pages/users";
 import Import from "./pages/import";
+import ResetPassword from "./pages/reset-password";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Switch>
         <Route path="/" component={Index} />
         <Route path="/sign-in" component={SignIn} />
+        <Route path="/reset-password" component={ResetPassword} />
         <Route path="/setup" component={Setup} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/leads" component={Leads} />
