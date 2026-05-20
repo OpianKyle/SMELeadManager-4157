@@ -13,6 +13,11 @@ const NAV = [
 ];
 
 const USER_CACHE_KEY = "masakhe_current_user";
+const SIDEBAR_KEY = "masakhe_sidebar_open";
+
+function isMobile() {
+  return window.innerWidth <= 1024;
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -22,7 +27,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       return cached ? JSON.parse(cached) : null;
     } catch { return null; }
   });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    if (isMobile()) return false;
+    const saved = localStorage.getItem(SIDEBAR_KEY);
+    return saved === null ? true : saved === "true";
+  });
 
   useEffect(() => {
     api.get("/me").then(r => r.json()).then(d => {
@@ -34,10 +45,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // Close sidebar on route change (mobile)
+  // Close sidebar on route change on mobile
   useEffect(() => {
-    setSidebarOpen(false);
+    if (isMobile()) setSidebarOpen(false);
   }, [location]);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(v => {
+      const next = !v;
+      if (!isMobile()) {
+        try { localStorage.setItem(SIDEBAR_KEY, String(next)); } catch {}
+      }
+      return next;
+    });
+  };
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -59,7 +80,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* Responsive styles */}
       <style>{`
         .layout-sidebar {
           width: 240px;
@@ -73,12 +93,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
           z-index: 100;
           transition: transform 0.25s ease;
         }
+        .layout-sidebar.closed {
+          transform: translateX(-100%);
+        }
         .layout-main {
-          margin-left: 240px;
           min-width: 0;
           flex: 1 1 0%;
           background: #eef2f6;
           min-height: 100vh;
+          margin-left: 240px;
+          transition: margin-left 0.25s ease;
+        }
+        .layout-main.sidebar-closed {
+          margin-left: 0;
         }
         .layout-content {
           padding: 28px 32px;
@@ -86,18 +113,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
         .sidebar-overlay {
           display: none;
         }
-        .hamburger-btn {
-          display: none;
+        .toggle-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          color: #fff;
+          width: 36px;
+          height: 36px;
+          border-radius: 4px;
+          flex-shrink: 0;
+        }
+        .toggle-btn:hover {
+          background: rgba(255,255,255,0.1);
         }
         @media (max-width: 1024px) {
-          .layout-sidebar {
-            transform: translateX(-100%);
-          }
-          .layout-sidebar.open {
-            transform: translateX(0);
-          }
           .layout-main {
-            margin-left: 0;
+            margin-left: 0 !important;
           }
           .layout-content {
             padding: 20px 24px;
@@ -108,22 +143,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             inset: 0;
             background: rgba(0,0,0,0.5);
             z-index: 99;
-          }
-          .hamburger-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            color: #fff;
-            width: 36px;
-            height: 36px;
-            border-radius: 4px;
-          }
-          .hamburger-btn:hover {
-            background: rgba(255,255,255,0.1);
           }
           .topbar-title {
             font-size: 15px !important;
@@ -140,20 +159,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
       `}</style>
 
       <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Open Sans', Arial, sans-serif" }}>
-        {/* Mobile overlay */}
+        {/* Mobile overlay — only when open on small screens */}
         {sidebarOpen && (
-          <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+          <div className="sidebar-overlay" onClick={toggleSidebar} />
         )}
 
         {/* Sidebar */}
-        <aside className={`layout-sidebar${sidebarOpen ? " open" : ""}`}>
+        <aside className={`layout-sidebar${sidebarOpen ? "" : " closed"}`}>
           {/* Logo */}
           <div style={{ padding: "24px 20px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{
                 width: 32, height: 32, background: "#118849", borderRadius: 4,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 900, fontSize: 18, color: "#fff"
+                fontWeight: 900, fontSize: 18, color: "#fff", flexShrink: 0,
               }}>M</div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 15, color: "#fff", lineHeight: 1.2 }}>Masakhe</div>
@@ -206,7 +225,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main */}
-        <main className="layout-main">
+        <main className={`layout-main${sidebarOpen ? "" : " sidebar-closed"}`}>
           {/* Top bar */}
           <div style={{
             background: "#0f326b", padding: "0 20px", height: 56,
@@ -214,17 +233,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
             position: "sticky", top: 0, zIndex: 50,
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              {/* Hamburger - only visible on mobile via CSS */}
               <button
-                className="hamburger-btn"
-                onClick={() => setSidebarOpen(v => !v)}
-                aria-label="Toggle menu"
+                className="toggle-btn"
+                onClick={toggleSidebar}
+                aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+                title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                  <line x1="3" y1="6" x2="21" y2="6"/>
-                  <line x1="3" y1="12" x2="21" y2="12"/>
-                  <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
+                {sidebarOpen ? (
+                  /* X icon when open */
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                ) : (
+                  /* Hamburger icon when closed */
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                  </svg>
+                )}
               </button>
               <h1 className="topbar-title" style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#fff", letterSpacing: 0.3 }}>
                 {NAV.find(n => location.startsWith(n.path))?.label ?? "Masakhe"}
