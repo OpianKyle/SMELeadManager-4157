@@ -794,8 +794,8 @@ export default function Leads() {
         .leads-cards {
           display: none;
         }
-        /* Mobile cards */
-        @media (max-width: 768px) {
+        /* Tablet + Mobile cards */
+        @media (max-width: 1024px) {
           .leads-table-wrap {
             display: none;
           }

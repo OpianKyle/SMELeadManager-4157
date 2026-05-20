@@ -140,20 +140,55 @@ export default function Users() {
         .users-table-wrap table td {
           white-space: nowrap;
         }
+        .users-cards {
+          display: none;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .user-card {
+          background: #fff;
+          border-radius: 6px;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+          padding: 16px;
+          border-left: 4px solid #5e708d;
+        }
+        .user-card-top {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 10px;
+        }
+        .user-card-meta {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px 12px;
+          font-size: 12px;
+          color: #5e708d;
+          margin-bottom: 12px;
+        }
+        .user-card-actions {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          padding-top: 10px;
+          border-top: 1px solid #eef2f6;
+        }
         @media (max-width: 900px) {
           .roles-grid {
             grid-template-columns: repeat(2, 1fr);
           }
         }
-        @media (max-width: 600px) {
+        @media (max-width: 1024px) {
+          .users-table-wrap {
+            display: none;
+          }
+          .users-cards {
+            display: flex;
+          }
           .roles-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             margin-bottom: 16px;
-          }
-          .users-table-wrap {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
           }
         }
       `}</style>
@@ -334,6 +369,94 @@ export default function Users() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile / Tablet Cards */}
+      <div className="users-cards">
+        {fetching && users.length === 0 && (
+          <div style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d", background: "#fff", borderRadius: 6 }}>
+            Loading users…
+          </div>
+        )}
+        {!fetching && users.length === 0 && (
+          <div style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d", background: "#fff", borderRadius: 6 }}>
+            No users yet. Create the first user to get started.
+          </div>
+        )}
+        {users.map(u => {
+          const roleMeta = ROLES.find(r => r.value === u.role);
+          const isMe = u.id === currentUser?.id;
+          const createdDate = u.createdAt
+            ? (() => { const d = typeof u.createdAt === "number" ? new Date(u.createdAt * 1000) : new Date(u.createdAt); return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("en-ZA"); })()
+            : "—";
+          return (
+            <div key={u.id} className="user-card" style={{ borderLeftColor: roleMeta?.color ?? "#5e708d" }}>
+              <div className="user-card-top">
+                <div style={{
+                  width: 40, height: 40, borderRadius: 20,
+                  background: roleMeta?.color ?? "#eef2f6",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 16, fontWeight: 700, color: "#fff", flexShrink: 0,
+                }}>
+                  {u.name.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#192943", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                    {u.name}
+                    {isMe && <span style={{ fontSize: 10, color: "#118849", fontWeight: 700 }}>(You)</span>}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#5e708d", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.email}</div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <span style={{
+                    padding: "3px 10px", borderRadius: 10, fontSize: 11, fontWeight: 700,
+                    background: roleMeta?.color ?? "#eef2f6", color: "#fff",
+                    textTransform: "uppercase", letterSpacing: "0.5px", whiteSpace: "nowrap",
+                  }}>{u.role?.replace(/_/g, " ")}</span>
+                  <span style={{
+                    padding: "3px 10px", borderRadius: 10, fontSize: 11, fontWeight: 700,
+                    background: u.isActive ? "#dcfce7" : "#fee2e2",
+                    color: u.isActive ? "#15803d" : "#dc2626", whiteSpace: "nowrap",
+                  }}>{u.isActive ? "Active" : "Inactive"}</span>
+                </div>
+              </div>
+
+              <div className="user-card-meta">
+                {u.department && <span><strong style={{ color: "#192943" }}>Dept:</strong> {u.department}</span>}
+                {u.phone && <span><strong style={{ color: "#192943" }}>Phone:</strong> {u.phone}</span>}
+                {u.whatsappNumber && <span><strong style={{ color: "#192943" }}>WhatsApp:</strong> {u.whatsappNumber}</span>}
+                <span><strong style={{ color: "#192943" }}>Joined:</strong> {createdDate}</span>
+              </div>
+
+              <div className="user-card-actions">
+                {(isSuperAdmin || currentUser?.role === "admin") && (
+                  <button onClick={() => setEditUser({ ...u })} style={{
+                    padding: "7px 14px", background: "#eef2f6", border: "1px solid #d1d9e0",
+                    color: "#192943", borderRadius: 3, fontSize: 13, cursor: "pointer",
+                    fontFamily: "'Open Sans',Arial,sans-serif",
+                  }}>Edit</button>
+                )}
+                {isSuperAdmin && !isMe && (
+                  <>
+                    <button onClick={() => toggleActive(u)} style={{
+                      padding: "7px 14px",
+                      background: u.isActive ? "#fffbeb" : "#f0fdf4",
+                      border: `1px solid ${u.isActive ? "#fcd34d" : "#86efac"}`,
+                      color: u.isActive ? "#d97706" : "#15803d",
+                      borderRadius: 3, fontSize: 13, cursor: "pointer",
+                      fontFamily: "'Open Sans',Arial,sans-serif",
+                    }}>{u.isActive ? "Deactivate" : "Activate"}</button>
+                    <button onClick={() => deleteUser(u.id)} style={{
+                      padding: "7px 14px", background: "#fef2f2", border: "1px solid #fecaca",
+                      color: "#dc2626", borderRadius: 3, fontSize: 13, cursor: "pointer",
+                      fontFamily: "'Open Sans',Arial,sans-serif",
+                    }}>Delete</button>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Create user modal */}
