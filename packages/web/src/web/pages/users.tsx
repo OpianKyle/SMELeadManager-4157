@@ -561,7 +561,7 @@ export default function Users() {
 
                 {isSuperAdmin && (
                   <div style={{ marginBottom: 20 }}>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#192943", marginBottom: 8 }}>Role & Permissions</label>
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#192943", marginBottom: 8 }}>Role</label>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {ROLES.map(r => (
                         <label key={r.value} style={{
@@ -588,6 +588,53 @@ export default function Users() {
                     </div>
                   </div>
                 )}
+
+                {isSuperAdmin && editUser.role !== "super_admin" && (() => {
+                  const NAV_SECTIONS = [
+                    { key: "dashboard",        label: "Dashboard" },
+                    { key: "leads",            label: "Leads" },
+                    { key: "import",           label: "Import Leads" },
+                    { key: "workflow",         label: "Workflow" },
+                    { key: "email-automation", label: "Email Automation" },
+                    ...(["admin"].includes(editUser.role) ? [{ key: "users", label: "User Management" }] : []),
+                  ];
+                  const current: string[] = (() => {
+                    try { return editUser.permissions ? JSON.parse(editUser.permissions) : NAV_SECTIONS.map(s => s.key); }
+                    catch { return NAV_SECTIONS.map(s => s.key); }
+                  })();
+                  const toggle = (key: string) => {
+                    const next = current.includes(key) ? current.filter(k => k !== key) : [...current, key];
+                    setEditUser((p: any) => ({ ...p, permissions: JSON.stringify(next) }));
+                  };
+                  return (
+                    <div style={{ marginBottom: 20 }}>
+                      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#192943", marginBottom: 4 }}>
+                        Visible Sections
+                      </label>
+                      <p style={{ margin: "0 0 10px", fontSize: 12, color: "#5e708d" }}>
+                        Choose which pages this user can access.
+                      </p>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        {NAV_SECTIONS.map(s => (
+                          <label key={s.key} style={{
+                            display: "flex", alignItems: "center", gap: 8,
+                            padding: "9px 12px", borderRadius: 3, cursor: "pointer",
+                            border: `1px solid ${current.includes(s.key) ? "#118849" : "#d1d9e0"}`,
+                            background: current.includes(s.key) ? "#f0fdf4" : "#fafbfc",
+                            fontSize: 13, color: "#192943",
+                          }}>
+                            <input
+                              type="checkbox"
+                              checked={current.includes(s.key)}
+                              onChange={() => toggle(s.key)}
+                            />
+                            {s.label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div style={{ display: "flex", gap: 10 }}>
                   <button type="submit" disabled={loading} style={{

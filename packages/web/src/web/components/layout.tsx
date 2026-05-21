@@ -65,10 +65,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
     window.location.href = "/";
   };
 
+  const userPermissions: string[] | null = user?.permissions
+    ? (() => { try { return JSON.parse(user.permissions); } catch { return null; } })()
+    : null;
+
   const visibleNav = NAV.filter(n => {
-    if (!n.roles) return true;
     if (!user) return false;
-    return n.roles.includes(user.role);
+    if (n.roles && !n.roles.includes(user.role)) return false;
+    if (user.role === "super_admin") return true;
+    if (userPermissions === null) return true;
+    const key = n.path.replace("/", "");
+    return userPermissions.includes(key);
   });
 
   const ROLE_COLORS: Record<string, string> = {

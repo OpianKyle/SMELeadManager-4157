@@ -19,6 +19,7 @@ async function runMigrations() {
   const stmts = [
     "ALTER TABLE `user` ADD COLUMN `manager_id` VARCHAR(191) NULL",
     "ALTER TABLE `lead` ADD COLUMN `created_by` VARCHAR(191) NULL",
+    "ALTER TABLE `user` ADD COLUMN `permissions` VARCHAR(1000) NULL",
   ];
   for (const stmt of stmts) {
     try {
@@ -179,6 +180,7 @@ app.put("/users/:id", async (c) => {
   }
 
   const allowed = ["name", "phone", "department", "isActive", "role"];
+  if (currentUser?.role === "super_admin") allowed.push("permissions");
   const update: any = {};
   for (const k of allowed) {
     if (body[k] !== undefined) update[k] = body[k];

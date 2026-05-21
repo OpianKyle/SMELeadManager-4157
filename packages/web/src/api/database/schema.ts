@@ -16,6 +16,7 @@ export const user = mysqlTable("user", {
   department: varchar("department", { length: 255 }),
   whatsappNumber: varchar("whatsapp_number", { length: 50 }),
   managerId: varchar("manager_id", { length: 191 }),
+  permissions: varchar("permissions", { length: 1000 }),
 });
 
 export const session = mysqlTable("session", {
