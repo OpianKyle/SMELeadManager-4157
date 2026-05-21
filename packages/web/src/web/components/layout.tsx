@@ -11,7 +11,8 @@ const NAV = [
   { path: "/email-automation", label: "Email Automation", icon: "📧" },
   { path: "/users", label: "User Management", icon: "🔐", roles: ["super_admin", "admin"] },
   { path: "/activity-log", label: "Activity Log", icon: "📋", roles: ["super_admin", "admin"] },
-  { path: "/media", label: "Media Library", icon: "🖼️", roles: ["super_admin"] },
+  { path: "/media", label: "Media Library", icon: "🖼️", roles: ["super_admin", "admin", "agent"] },
+  { path: "/email-campaign", label: "Email Campaign", icon: "✉️", roles: ["super_admin"] },
 ];
 
 const USER_CACHE_KEY = "masakhe_current_user";

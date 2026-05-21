@@ -401,3 +401,242 @@ export function demoReminderEmail(name: string, demoDate: string, meetLink: stri
     `),
   };
 }
+
+// ── Campaign Email Helper ─────────────────────────────────────────────
+function campaignBody(headline: string, paragraphs: string[], ctaText = "Start Your Free Trial →"): string {
+  return `
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">${headline}</p>
+    </div>
+    ${paragraphs.map(p => `<p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">${p}</p>`).join("")}
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">${ctaText}</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  `;
+}
+
+export const CAMPAIGN_EMAILS: Array<{ stepNumber: number; subject: string; bodyHtml: string; delayDays: number }> = [
+  {
+    stepNumber: 1, delayDays: 0,
+    subject: "One platform. Everything your SMME needs.",
+    bodyHtml: campaignBody(
+      "The All-in-One Business Platform for South African SMMEs",
+      [
+        "Running a small business means juggling a dozen tools. <strong>Masakhe</strong> brings them all together — website, invoices, payroll, CRM, social media, and finances. No more jumping between tabs.",
+        "Claim your <strong>14-day free trial</strong> and see the difference.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 2, delayDays: 2,
+    subject: "Your website, live in minutes (no developer needed)",
+    bodyHtml: campaignBody(
+      "AI Website Builder — Drag, Drop, Go Live",
+      [
+        "With Masakhe's AI website builder you get a free <strong>drag-and-drop website builder</strong>. Edit with the WYSIWYG editor and post live! Professional, fast, and mobile-friendly — perfect for South African SMMEs.",
+        "Build yours <strong>free for 14 days</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 3, delayDays: 2,
+    subject: "Stop chasing payments. Start sending professional invoices.",
+    bodyHtml: campaignBody(
+      "Invoicing That Gets You Paid Faster",
+      [
+        "Choose from multiple templates, add your logo, and send <strong>quotes and invoices in minutes</strong> from your dashboard. Track what's paid and what's overdue — all in one place.",
+        "Try it <strong>free for two weeks</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 4, delayDays: 2,
+    subject: "Payroll headaches? Not anymore.",
+    bodyHtml: campaignBody(
+      "Payroll Made Simple",
+      [
+        "Generate payslips, <strong>auto-calculate deductions</strong>, and manage employee records without spreadsheets. Masakhe handles the numbers so you can focus on your team.",
+        "Test payroll with your <strong>free trial</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 5, delayDays: 2,
+    subject: "Never lose a lead again.",
+    bodyHtml: campaignBody(
+      "Client Management (CRM) Built-In",
+      [
+        "Keep all client conversations, documents, and history in one place. Masakhe's CRM helps you <strong>nurture relationships and close deals faster</strong> — custom built for you at no extra cost.",
+        "Experience the CRM <strong>free for 14 days</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 6, delayDays: 2,
+    subject: "Plan a week of posts in minutes.",
+    bodyHtml: campaignBody(
+      "Social Media Scheduling — Done in Minutes",
+      [
+        "Create, download and post to <strong>all your social channels</strong> from Masakhe in minutes. No more last-minute rushes or forgotten posts — just consistent engagement.",
+        "Start scheduling <strong>free today</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 7, delayDays: 2,
+    subject: "Know exactly where every rand goes.",
+    bodyHtml: campaignBody(
+      "Financial Transaction Tracking",
+      [
+        "Link your transactions, track expenses, and see your <strong>cash flow at a glance</strong>. Masakhe gives you the financial clarity every SMME needs to grow.",
+        "See it in action with a <strong>free trial</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 8, delayDays: 2,
+    subject: "Reclaim your time. Let Masakhe do the busy work.",
+    bodyHtml: campaignBody(
+      "Save Hours Every Week",
+      [
+        "Imagine not switching between six different apps. Masakhe <strong>automates invoicing, payroll, social media, and more</strong> — so you can focus on serving customers.",
+        "Try the time-saver <strong>free for 14 days</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 9, delayDays: 2,
+    subject: "Stop paying for 5 separate tools.",
+    bodyHtml: campaignBody(
+      "Cut Costs — One Platform Instead of Many",
+      [
+        "Website builder + invoicing + payroll + CRM + social scheduler = thousands of rands. <strong>Masakhe combines them all from R899/month</strong> after trial.",
+        "First <strong>14 days are on us</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 10, delayDays: 2,
+    subject: "Small business, big brand impression.",
+    bodyHtml: campaignBody(
+      "Look Professional, Win More Business",
+      [
+        "A sleek website, branded invoices, and organised client management make you look like a market leader. Masakhe gives you that <strong>polished image without the high cost</strong>.",
+        "Build your professional presence <strong>free</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 11, delayDays: 2,
+    subject: "Designed for South African SMMEs – easy for everyone.",
+    bodyHtml: campaignBody(
+      "No Tech Skills? No Problem.",
+      [
+        "Drag, drop, click, done. Masakhe's interface is <strong>intuitive, with guided steps for every feature</strong>. You don't need an IT degree to run your business like a pro.",
+        "Prove it to yourself — <strong>free trial</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 12, delayDays: 2,
+    subject: "A free trial that's actually free.",
+    bodyHtml: campaignBody(
+      "Zero Risk, Zero Credit Card",
+      [
+        "<strong>No credit card required. No hidden fees.</strong> Just 14 full days of access to everything Masakhe offers. If you love it, upgrade later. If not, walk away.",
+        "Start your <strong>risk-free trial today</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 13, delayDays: 2,
+    subject: "Your 14-day roadmap to a smoother business.",
+    bodyHtml: campaignBody(
+      "The First 14 Days: What to Try",
+      [
+        "<strong>Day 1:</strong> Build your AI website. <strong>Day 3:</strong> Send an invoice. <strong>Day 5:</strong> Schedule social posts. <strong>Day 7:</strong> Run payroll. By day 14, you'll wonder how you managed without Masakhe.",
+        "Get the full roadmap — <strong>start free</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 14, delayDays: 2,
+    subject: "Stop juggling. Start managing.",
+    bodyHtml: campaignBody(
+      "From Chaos to Control",
+      [
+        "When your clients, finances, and team are all in one place, running your business becomes <strong>calm and clear</strong>. Masakhe brings order to the chaos.",
+        "Experience control <strong>free for 14 days</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 15, delayDays: 2,
+    subject: "Your business is ready to scale. Is your software?",
+    bodyHtml: campaignBody(
+      "Grow Without Growing Pains",
+      [
+        "Masakhe grows with you. Add more clients, more employees, more social accounts — the platform handles it all. <strong>No need to switch tools when you level up.</strong>",
+        "Test the scalability <strong>free</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 16, delayDays: 2,
+    subject: "Local taxes. Local rules. Local support.",
+    bodyHtml: campaignBody(
+      "Built for South African SMMEs",
+      [
+        "Masakhe understands <strong>SARS payroll requirements</strong>, local invoice regulations, and the way you do business. Not a generic international tool — <strong>made for you</strong>.",
+        "Try the local advantage <strong>free</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 17, delayDays: 2,
+    subject: "Sleep better knowing your business data is protected.",
+    bodyHtml: campaignBody(
+      "Your Data, Safe and Secure",
+      [
+        "We take security seriously. Your client info, payroll records, and financial data are <strong>encrypted and backed up</strong>. So you can focus on growing, not worrying.",
+        "See our security features <strong>free</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 18, delayDays: 2,
+    subject: "The dashboard that does it all.",
+    bodyHtml: campaignBody(
+      "One Login. Full Control.",
+      [
+        "Log in once. From one dashboard, manage your website, send invoices, run payroll, talk to clients, schedule posts, and track money. <strong>That's the Masakhe power.</strong>",
+        "Experience total control <strong>free</strong>.",
+      ]
+    ),
+  },
+  {
+    stepNumber: 19, delayDays: 2,
+    subject: "Join hundreds of South African businesses already saving time.",
+    bodyHtml: campaignBody(
+      "Real SMMEs, Real Results",
+      [
+        "<em>&ldquo;Masakhe cut my admin by 70%.&rdquo;</em> &nbsp; <em>&ldquo;I built my site in 10 minutes.&rdquo;</em> &nbsp; <em>&ldquo;Finally, one tool for everything.&rdquo;</em>",
+        "Don't just take our word for it. <strong>Join them — start your free trial.</strong>",
+      ]
+    ),
+  },
+  {
+    stepNumber: 20, delayDays: 2,
+    subject: "Don't let another week slip away.",
+    bodyHtml: campaignBody(
+      "Last Chance: Your Free Trial Awaits",
+      [
+        "Every day you wait is another day of juggling spreadsheets, missed social posts, and late invoices. <strong>Your 14-day free trial is ready — claim it now.</strong>",
+      ],
+      "Start Your Free Trial Now →"
+    ),
+  },
+];

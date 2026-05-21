@@ -1,9 +1,9 @@
-import { eq, and, lt, notInArray, isNull, inArray } from "drizzle-orm";
+import { eq, and, lt, notInArray, isNull, inArray, asc } from "drizzle-orm";
 import { database } from "./database";
 import * as schema from "./database/schema";
 import { sendEmail } from "./mailer";
 import {
-  stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail,
+  stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper,
 } from "./emails";
 
 function generateDemoSlots(from: Date): string[] {
@@ -321,6 +321,77 @@ export async function runAutomationTick() {
           console.log(`[automation] 1h reminder sent to ${lead.email}`);
         } catch (e: any) {
           console.error(`[automation] 1h reminder failed for ${lead.email}:`, e.message);
+        }
+      }
+    }
+
+    // ── Campaign Sequence ────────────────────────────────────────────
+    const campaignSteps = await database
+      .select()
+      .from(schema.emailCampaignStep)
+      .where(eq(schema.emailCampaignStep.enabled, true))
+      .orderBy(asc(schema.emailCampaignStep.stepNumber));
+
+    if (campaignSteps.length > 0) {
+      const activeLeads = await database
+        .select()
+        .from(schema.lead)
+        .where(
+          and(
+            eq(schema.lead.optedOut, false),
+            notInArray(schema.lead.stage, ["completed", "opted_out"]),
+          )
+        );
+
+      for (const lead of activeLeads) {
+        const logs = await database
+          .select()
+          .from(schema.emailLog)
+          .where(eq(schema.emailLog.leadId, lead.id));
+
+        // Find all sent campaign steps and the last one's timestamp
+        const sentCampaignSteps: Record<number, Date> = {};
+        for (const log of logs) {
+          const m = log.stage?.match(/^campaign_(\d+)$/);
+          if (m) {
+            const num = parseInt(m[1]);
+            const sentAt = log.createdAt instanceof Date ? log.createdAt : new Date(log.createdAt as any);
+            sentCampaignSteps[num] = sentAt;
+          }
+        }
+
+        // Find the next step to send
+        const nextStep = campaignSteps.find(s => !(s.stepNumber in sentCampaignSteps));
+        if (!nextStep) continue;
+
+        // Determine reference time: lead creation for step 1, last sent for subsequent
+        let referenceTime: Date;
+        if (Object.keys(sentCampaignSteps).length === 0) {
+          referenceTime = lead.createdAt instanceof Date ? lead.createdAt : new Date(lead.createdAt as any);
+        } else {
+          const lastNum = Math.max(...Object.keys(sentCampaignSteps).map(Number));
+          referenceTime = sentCampaignSteps[lastNum];
+        }
+
+        const delayMs = nextStep.delayDays * 24 * 60 * 60 * 1000;
+        const sendAfter = new Date(referenceTime.getTime() + delayMs);
+        if (now < sendAfter) continue;
+
+        try {
+          const html = emailWrapper(nextStep.bodyHtml);
+          // Mark before send to prevent race conditions
+          await database.insert(schema.emailLog).values({
+            id: crypto.randomUUID(),
+            leadId: lead.id,
+            stage: `campaign_${nextStep.stepNumber}`,
+            subject: nextStep.subject,
+            sentBy: "auto",
+            status: "sent",
+          });
+          await sendEmail({ to: lead.email, subject: nextStep.subject, html });
+          console.log(`[campaign] Email ${nextStep.stepNumber} sent to ${lead.email}`);
+        } catch (e: any) {
+          console.error(`[campaign] Email ${nextStep.stepNumber} failed for ${lead.email}:`, e.message);
         }
       }
     }

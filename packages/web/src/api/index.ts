@@ -5,7 +5,8 @@ import * as schema from "./database/schema";
 import { database } from "./database";
 import { createAuth } from "./auth";
 import {
-  stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper
+  stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper,
+  CAMPAIGN_EMAILS,
 } from "./emails";
 import { sendEmail } from "./mailer";
 import { startAutomation, runAutomationTick } from "./automation";
@@ -42,12 +43,39 @@ async function runMigrations() {
       \`uploaded_by_name\` VARCHAR(255),
       \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE TABLE IF NOT EXISTS \`email_campaign_step\` (
+      \`id\` VARCHAR(191) NOT NULL PRIMARY KEY,
+      \`step_number\` INT NOT NULL,
+      \`subject\` VARCHAR(500) NOT NULL,
+      \`body_html\` TEXT NOT NULL,
+      \`delay_days\` INT NOT NULL DEFAULT 2,
+      \`enabled\` TINYINT(1) NOT NULL DEFAULT 1,
+      \`updated_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY \`step_number_unique\` (\`step_number\`)
+    )`,
   ];
   for (const stmt of stmts) {
     try {
       await database.execute(sql.raw(stmt));
     } catch (e: any) {
       if (e?.code !== "ER_DUP_FIELDNAME") console.warn("[migration]", e?.message);
+    }
+  }
+
+  // Seed campaign emails if not present (use parameterised insert to handle special chars)
+  for (const email of CAMPAIGN_EMAILS) {
+    try {
+      await database.insert(schema.emailCampaignStep).values({
+        id: crypto.randomUUID(),
+        stepNumber: email.stepNumber,
+        subject: email.subject,
+        bodyHtml: email.bodyHtml,
+        delayDays: email.delayDays,
+        enabled: true,
+      });
+    } catch (e: any) {
+      // ER_DUP_ENTRY means the row already exists — skip silently
+      if (e?.code !== "ER_DUP_ENTRY") console.warn("[seed] campaign step", email.stepNumber, e?.message);
     }
   }
 }
@@ -554,7 +582,7 @@ function getCategory(mime: string, name: string): string {
 }
 
 app.get("/media", async (c) => {
-  const err = requireRole(c, ["super_admin"]);
+  const err = requireRole(c, ["super_admin", "admin", "agent"]);
   if (err) return err;
   const files = await db().select().from(schema.mediaFile).orderBy(desc(schema.mediaFile.createdAt));
   return c.json({ files }, 200);
@@ -599,6 +627,29 @@ app.delete("/media/:id", async (c) => {
     try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch {}
     await db().delete(schema.mediaFile).where(eq(schema.mediaFile.id, id));
   }
+  return c.json({ success: true }, 200);
+});
+
+// ── Campaign Steps ────────────────────────────────────────────────────
+app.get("/campaign-steps", async (c) => {
+  const err = requireRole(c, ["super_admin"]);
+  if (err) return err;
+  const steps = await db().select().from(schema.emailCampaignStep)
+    .orderBy(schema.emailCampaignStep.stepNumber);
+  return c.json({ steps }, 200);
+});
+
+app.put("/campaign-steps/:id", async (c) => {
+  const err = requireRole(c, ["super_admin"]);
+  if (err) return err;
+  const id = c.req.param("id");
+  const body = await c.req.json();
+  const update: Record<string, any> = {};
+  if (body.delayDays !== undefined) update.delayDays = Math.max(0, parseInt(body.delayDays) || 0);
+  if (body.enabled !== undefined) update.enabled = !!body.enabled;
+  if (body.subject !== undefined && body.subject.trim()) update.subject = body.subject.trim();
+  update.updatedAt = new Date();
+  await db().update(schema.emailCampaignStep).set(update).where(eq(schema.emailCampaignStep.id, id));
   return c.json({ success: true }, 200);
 });
 

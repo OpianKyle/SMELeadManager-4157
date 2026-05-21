@@ -160,6 +160,17 @@ export const activityLog = mysqlTable("activity_log", {
   createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ── Email Campaign Steps ─────────────────────────────────────────────
+export const emailCampaignStep = mysqlTable("email_campaign_step", {
+  id: varchar("id", { length: 191 }).primaryKey(),
+  stepNumber: int("step_number").notNull(),
+  subject: varchar("subject", { length: 500 }).notNull(),
+  bodyHtml: text("body_html").notNull(),
+  delayDays: int("delay_days").notNull().default(2),
+  enabled: boolean("enabled").notNull().default(true),
+  updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 // ── Workflow Config ──────────────────────────────────────────────────
 export const workflowConfig = mysqlTable("workflow_config", {
   id: varchar("id", { length: 50 }).primaryKey().default("default"),

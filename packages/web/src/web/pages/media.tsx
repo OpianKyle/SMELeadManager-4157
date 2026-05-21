@@ -2,12 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Layout } from "@/components/layout";
 import { api } from "@/lib/api";
 
-const ACCEPT = {
-  image: "image/*",
-  video: "video/*",
-  sheet: ".csv,.xlsx,.xls,.ods",
-};
-
 const CATEGORY_META: Record<string, { label: string; color: string; icon: string }> = {
   image: { label: "Image",       color: "#0369a1", icon: "🖼️" },
   video: { label: "Video",       color: "#7c3aed", icon: "🎬" },
@@ -33,9 +27,15 @@ export default function Media() {
   const [filterCat, setFilterCat] = useState("");
   const [preview, setPreview] = useState<any>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    api.get("/me").then(r => r.json()).then(d => setUser(d.user));
+  }, []);
+
+  const isSuperAdmin = user?.role === "super_admin";
 
   const load = () => {
     setFetching(true);
@@ -104,15 +104,19 @@ export default function Media() {
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#192943" }}>Media Library</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#5e708d" }}>{files.length} file{files.length !== 1 ? "s" : ""} · images, videos and spreadsheets</p>
         </div>
-        <button onClick={() => inputRef.current?.click()} disabled={uploading} style={{
-          padding: "9px 20px", background: "#118849", color: "#fff", border: "none",
-          borderRadius: 3, fontSize: 13, fontWeight: 700, cursor: uploading ? "not-allowed" : "pointer",
-          fontFamily: "'Open Sans',Arial,sans-serif", opacity: uploading ? 0.7 : 1,
-        }}>
-          {uploading ? uploadProgress : "+ Upload Files"}
-        </button>
-        <input ref={inputRef} type="file" multiple accept="image/*,video/*,.csv,.xlsx,.xls,.ods"
-          style={{ display: "none" }} onChange={e => upload(e.target.files)} />
+        {isSuperAdmin && (
+          <>
+            <button onClick={() => inputRef.current?.click()} disabled={uploading} style={{
+              padding: "9px 20px", background: "#118849", color: "#fff", border: "none",
+              borderRadius: 3, fontSize: 13, fontWeight: 700, cursor: uploading ? "not-allowed" : "pointer",
+              fontFamily: "'Open Sans',Arial,sans-serif", opacity: uploading ? 0.7 : 1,
+            }}>
+              {uploading ? uploadProgress : "+ Upload Files"}
+            </button>
+            <input ref={inputRef} type="file" multiple accept="image/*,video/*,.csv,.xlsx,.xls,.ods"
+              style={{ display: "none" }} onChange={e => upload(e.target.files)} />
+          </>
+        )}
       </div>
 
       {/* Stats */}
@@ -130,29 +134,31 @@ export default function Media() {
         ))}
       </div>
 
-      {/* Drop zone */}
-      <div
-        className={`media-drop${dragOver ? " drag" : ""}`}
-        style={{ marginBottom: 20 }}
-        onClick={() => inputRef.current?.click()}
-        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={e => { e.preventDefault(); setDragOver(false); upload(e.dataTransfer.files); }}
-      >
-        <div style={{ fontSize: 32, marginBottom: 8 }}>☁️</div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: "#192943", marginBottom: 4 }}>
-          {dragOver ? "Drop to upload" : "Drag & drop files here, or click to browse"}
+      {/* Drop zone — super admin only */}
+      {isSuperAdmin && (
+        <div
+          className={`media-drop${dragOver ? " drag" : ""}`}
+          style={{ marginBottom: 20 }}
+          onClick={() => inputRef.current?.click()}
+          onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={e => { e.preventDefault(); setDragOver(false); upload(e.dataTransfer.files); }}
+        >
+          <div style={{ fontSize: 32, marginBottom: 8 }}>☁️</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#192943", marginBottom: 4 }}>
+            {dragOver ? "Drop to upload" : "Drag & drop files here, or click to browse"}
+          </div>
+          <div style={{ fontSize: 12, color: "#5e708d" }}>Images, videos, CSV and Excel spreadsheets</div>
+          {uploading && <div style={{ marginTop: 12, fontSize: 13, color: "#118849", fontWeight: 600 }}>{uploadProgress}</div>}
         </div>
-        <div style={{ fontSize: 12, color: "#5e708d" }}>Images, videos, CSV and Excel spreadsheets</div>
-        {uploading && <div style={{ marginTop: 12, fontSize: 13, color: "#118849", fontWeight: 600 }}>{uploadProgress}</div>}
-      </div>
+      )}
 
       {/* Grid */}
       {fetching ? (
         <div style={{ textAlign: "center", padding: 40, color: "#5e708d" }}>Loading…</div>
       ) : filtered.length === 0 ? (
         <div style={{ background: "#fff", borderRadius: 4, padding: 40, textAlign: "center", color: "#5e708d", boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-          {filterCat ? `No ${CATEGORY_META[filterCat]?.label.toLowerCase()}s uploaded yet.` : "No files uploaded yet. Drag and drop or click Upload Files to get started."}
+          {filterCat ? `No ${CATEGORY_META[filterCat]?.label.toLowerCase()}s uploaded yet.` : "No files uploaded yet."}
         </div>
       ) : (
         <div className="media-grid">
@@ -213,11 +219,13 @@ export default function Media() {
                 flex: 1, padding: "10px", background: "#0f326b", color: "#fff", borderRadius: 3,
                 fontSize: 13, fontWeight: 700, textAlign: "center", textDecoration: "none",
               }}>Download</a>
-              <button onClick={() => deleteFile(preview.id, preview.originalName)} style={{
-                padding: "10px 16px", background: "#fef2f2", border: "1px solid #fecaca",
-                color: "#dc2626", borderRadius: 3, fontSize: 13, fontWeight: 600, cursor: "pointer",
-                fontFamily: "'Open Sans',Arial,sans-serif",
-              }}>Delete</button>
+              {isSuperAdmin && (
+                <button onClick={() => deleteFile(preview.id, preview.originalName)} style={{
+                  padding: "10px 16px", background: "#fef2f2", border: "1px solid #fecaca",
+                  color: "#dc2626", borderRadius: 3, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "'Open Sans',Arial,sans-serif",
+                }}>Delete</button>
+              )}
             </div>
           </div>
         </div>
