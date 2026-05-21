@@ -11,6 +11,7 @@ import EmailAutomation from "./pages/email-automation";
 import Users from "./pages/users";
 import Import from "./pages/import";
 import ResetPassword from "./pages/reset-password";
+import ActivityLog from "./pages/activity-log";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/workflow" component={Workflow} />
         <Route path="/email-automation" component={EmailAutomation} />
         <Route path="/users" component={Users} />
+        <Route path="/activity-log" component={ActivityLog} />
       </Switch>
       {import.meta.env.DEV && <AgentFeedback />}
     </Provider>

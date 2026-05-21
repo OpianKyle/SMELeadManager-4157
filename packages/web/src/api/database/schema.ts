@@ -134,6 +134,19 @@ export const googleToken = mysqlTable("google_token", {
   updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ── Activity Log ─────────────────────────────────────────────────────
+export const activityLog = mysqlTable("activity_log", {
+  id: varchar("id", { length: 191 }).primaryKey(),
+  userId: varchar("user_id", { length: 191 }),
+  userName: varchar("user_name", { length: 255 }),
+  userRole: varchar("user_role", { length: 50 }),
+  action: varchar("action", { length: 100 }).notNull(),
+  entity: varchar("entity", { length: 50 }),
+  entityId: varchar("entity_id", { length: 191 }),
+  details: text("details"),
+  createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 // ── Workflow Config ──────────────────────────────────────────────────
 export const workflowConfig = mysqlTable("workflow_config", {
   id: varchar("id", { length: 50 }).primaryKey().default("default"),

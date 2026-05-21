@@ -20,6 +20,17 @@ async function runMigrations() {
     "ALTER TABLE `user` ADD COLUMN `manager_id` VARCHAR(191) NULL",
     "ALTER TABLE `lead` ADD COLUMN `created_by` VARCHAR(191) NULL",
     "ALTER TABLE `user` ADD COLUMN `permissions` VARCHAR(1000) NULL",
+    `CREATE TABLE IF NOT EXISTS \`activity_log\` (
+      \`id\` VARCHAR(191) NOT NULL PRIMARY KEY,
+      \`user_id\` VARCHAR(191),
+      \`user_name\` VARCHAR(255),
+      \`user_role\` VARCHAR(50),
+      \`action\` VARCHAR(100) NOT NULL,
+      \`entity\` VARCHAR(50),
+      \`entity_id\` VARCHAR(191),
+      \`details\` TEXT,
+      \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
   ];
   for (const stmt of stmts) {
     try {
@@ -78,6 +89,29 @@ app.use("*", async (c, next) => {
 
 function db() {
   return database;
+}
+
+async function logActivity(opts: {
+  user: any;
+  action: string;
+  entity?: string;
+  entityId?: string;
+  details?: Record<string, any>;
+}) {
+  try {
+    await database.insert(schema.activityLog).values({
+      id: crypto.randomUUID(),
+      userId: opts.user?.id ?? null,
+      userName: opts.user?.name ?? "System",
+      userRole: opts.user?.role ?? null,
+      action: opts.action,
+      entity: opts.entity ?? null,
+      entityId: opts.entityId ?? null,
+      details: opts.details ? JSON.stringify(opts.details) : null,
+    });
+  } catch (e) {
+    console.error("[activity_log] Failed to write log:", e);
+  }
 }
 
 function requireAuth(c: any) {
@@ -162,6 +196,9 @@ app.post("/users", async (c) => {
         .set({ role: assignedRole as any, phone, department, whatsappNumber, ...(managerId ? { managerId } : {}) })
         .where(eq(schema.user.id, result.user.id));
     }
+    if (result?.user?.id) {
+      logActivity({ user: currentUser, action: "user_created", entity: "user", entityId: result.user.id, details: { name, email, role: assignedRole } });
+    }
     return c.json({ success: true, userId: result?.user?.id }, 200);
   } catch (e: any) {
     return c.json({ error: e?.message ?? "Failed to create user" }, 400);
@@ -188,6 +225,7 @@ app.put("/users/:id", async (c) => {
   update.updatedAt = new Date();
 
   await db().update(schema.user).set(update).where(eq(schema.user.id, id));
+  logActivity({ user: currentUser, action: "user_updated", entity: "user", entityId: id, details: update });
   return c.json({ success: true }, 200);
 });
 
@@ -197,7 +235,9 @@ app.delete("/users/:id", async (c) => {
   const id = c.req.param("id");
   const currentUser = c.get("user");
   if (id === currentUser?.id) return c.json({ error: "Cannot delete yourself" }, 400);
+  const [target] = await db().select().from(schema.user).where(eq(schema.user.id, id));
   await db().delete(schema.user).where(eq(schema.user.id, id));
+  logActivity({ user: currentUser, action: "user_deleted", entity: "user", entityId: id, details: { name: target?.name, email: target?.email } });
   return c.json({ success: true }, 200);
 });
 
@@ -262,6 +302,7 @@ app.post("/leads", async (c) => {
   const body = await c.req.json();
   const id = crypto.randomUUID();
   await db().insert(schema.lead).values({ id, createdBy: u.id, ...body });
+  logActivity({ user: u, action: "lead_created", entity: "lead", entityId: id, details: { name: body.name, email: body.email, business: body.business } });
   // Fire stage 1 immediately — don't await so the response is instant
   maybeSendStage1(id);
   return c.json({ success: true, id }, 200);
@@ -291,9 +332,18 @@ async function maybeSendStage5(leadId: string) {
 app.put("/leads/:id", async (c) => {
   const err = requireRole(c, ["super_admin", "admin", "agent"]);
   if (err) return err;
+  const u = c.get("user")!;
   const id = c.req.param("id");
   const body = await c.req.json();
+  const [before] = await db().select().from(schema.lead).where(eq(schema.lead.id, id));
   await db().update(schema.lead).set({ ...body, updatedAt: new Date() }).where(eq(schema.lead.id, id));
+  if (body.stage && before?.stage !== body.stage) {
+    logActivity({ user: u, action: "lead_stage_changed", entity: "lead", entityId: id, details: { leadName: before?.name, from: before?.stage, to: body.stage } });
+  } else if (body.optedOut !== undefined) {
+    logActivity({ user: u, action: body.optedOut ? "lead_opted_out" : "lead_opted_in", entity: "lead", entityId: id, details: { leadName: before?.name } });
+  } else {
+    logActivity({ user: u, action: "lead_updated", entity: "lead", entityId: id, details: { leadName: before?.name, changes: Object.keys(body).join(", ") } });
+  }
   // If lead is being marked as booked with demo details, fire stage 5 confirmation
   if (body.stage === "booked") maybeSendStage5(id);
   return c.json({ success: true }, 200);
@@ -302,7 +352,11 @@ app.put("/leads/:id", async (c) => {
 app.delete("/leads/:id", async (c) => {
   const err = requireRole(c, ["super_admin", "admin"]);
   if (err) return err;
-  await db().delete(schema.lead).where(eq(schema.lead.id, c.req.param("id")));
+  const u = c.get("user")!;
+  const lid = c.req.param("id");
+  const [target] = await db().select().from(schema.lead).where(eq(schema.lead.id, lid));
+  await db().delete(schema.lead).where(eq(schema.lead.id, lid));
+  logActivity({ user: u, action: "lead_deleted", entity: "lead", entityId: lid, details: { name: target?.name, email: target?.email } });
   return c.json({ success: true }, 200);
 });
 
@@ -383,6 +437,7 @@ app.post("/email/send", async (c) => {
         .where(eq(schema.lead.id, leadId));
     }
 
+    logActivity({ user: c.get("user"), action: "email_sent", entity: "lead", entityId: leadId, details: { leadName: leadRow.name, stage, subject: emailData!.subject } });
     return c.json({ success: true }, 200);
   } catch (e: any) {
     await db().insert(schema.emailLog).values({
@@ -446,6 +501,7 @@ app.get("/workflow/config", async (c) => {
 app.put("/workflow/config", async (c) => {
   const err = requireRole(c, ["super_admin", "admin"]);
   if (err) return err;
+  const u = c.get("user")!;
   const body = await c.req.json();
   const [existing] = await db().select().from(schema.workflowConfig);
   if (existing) {
@@ -453,7 +509,28 @@ app.put("/workflow/config", async (c) => {
   } else {
     await db().insert(schema.workflowConfig).values({ id: "default", ...body });
   }
+  logActivity({ user: u, action: "workflow_updated", entity: "workflow", details: body });
   return c.json({ success: true }, 200);
+});
+
+// ── Activity Logs ─────────────────────────────────────────────────────
+app.get("/activity-logs", async (c) => {
+  const err = requireRole(c, ["super_admin", "admin"]);
+  if (err) return err;
+  const u = c.get("user")!;
+  let logs;
+  if (u.role === "admin") {
+    const teamMembers = await db().select({ id: schema.user.id }).from(schema.user)
+      .where(eq(schema.user.managerId, u.id));
+    const ids = [u.id, ...teamMembers.map(m => m.id)];
+    logs = await db().select().from(schema.activityLog)
+      .where(inArray(schema.activityLog.userId, ids))
+      .orderBy(desc(schema.activityLog.createdAt)).limit(500);
+  } else {
+    logs = await db().select().from(schema.activityLog)
+      .orderBy(desc(schema.activityLog.createdAt)).limit(500);
+  }
+  return c.json({ logs }, 200);
 });
 
 // ── Automation manual trigger ─────────────────────────────────────────

@@ -10,6 +10,7 @@ const NAV = [
   { path: "/workflow", label: "Workflow", icon: "⚡" },
   { path: "/email-automation", label: "Email Automation", icon: "📧" },
   { path: "/users", label: "User Management", icon: "🔐", roles: ["super_admin", "admin"] },
+  { path: "/activity-log", label: "Activity Log", icon: "📋", roles: ["super_admin", "admin"] },
 ];
 
 const USER_CACHE_KEY = "masakhe_current_user";
