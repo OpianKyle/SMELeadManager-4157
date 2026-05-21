@@ -12,6 +12,7 @@ import Users from "./pages/users";
 import Import from "./pages/import";
 import ResetPassword from "./pages/reset-password";
 import ActivityLog from "./pages/activity-log";
+import Media from "./pages/media";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/email-automation" component={EmailAutomation} />
         <Route path="/users" component={Users} />
         <Route path="/activity-log" component={ActivityLog} />
+        <Route path="/media" component={Media} />
       </Switch>
       {import.meta.env.DEV && <AgentFeedback />}
     </Provider>

@@ -31,6 +31,17 @@ async function runMigrations() {
       \`details\` TEXT,
       \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE TABLE IF NOT EXISTS \`media_file\` (
+      \`id\` VARCHAR(191) NOT NULL PRIMARY KEY,
+      \`original_name\` VARCHAR(500) NOT NULL,
+      \`file_name\` VARCHAR(500) NOT NULL,
+      \`mime_type\` VARCHAR(100) NOT NULL,
+      \`size\` INT NOT NULL,
+      \`category\` VARCHAR(50),
+      \`uploaded_by\` VARCHAR(191),
+      \`uploaded_by_name\` VARCHAR(255),
+      \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
   ];
   for (const stmt of stmts) {
     try {
@@ -253,15 +264,9 @@ app.get("/leads", async (c) => {
   const userMap = new Map(allUsers.map(au => [au.id, au.name]));
 
   let leads;
-  if (u.role === "agent") {
+  if (u.role === "agent" || u.role === "admin") {
     leads = await db().select().from(schema.lead)
       .where(eq(schema.lead.createdBy, u.id))
-      .orderBy(desc(schema.lead.createdAt));
-  } else if (u.role === "admin") {
-    const agentIds = allUsers.filter(au => au.managerId === u.id).map(au => au.id);
-    const allowedIds = [u.id, ...agentIds];
-    leads = await db().select().from(schema.lead)
-      .where(or(isNull(schema.lead.createdBy), inArray(schema.lead.createdBy, allowedIds)))
       .orderBy(desc(schema.lead.createdAt));
   } else {
     leads = await db().select().from(schema.lead).orderBy(desc(schema.lead.createdAt));
@@ -531,6 +536,70 @@ app.get("/activity-logs", async (c) => {
       .orderBy(desc(schema.activityLog.createdAt)).limit(500);
   }
   return c.json({ logs }, 200);
+});
+
+// ── Media Library ─────────────────────────────────────────────────────
+import path from "path";
+import fs from "fs";
+
+const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+function getCategory(mime: string, name: string): string {
+  if (mime.startsWith("image/")) return "image";
+  if (mime.startsWith("video/")) return "video";
+  const ext = name.split(".").pop()?.toLowerCase();
+  if (["csv","xlsx","xls","ods"].includes(ext ?? "")) return "sheet";
+  return "other";
+}
+
+app.get("/media", async (c) => {
+  const err = requireRole(c, ["super_admin"]);
+  if (err) return err;
+  const files = await db().select().from(schema.mediaFile).orderBy(desc(schema.mediaFile.createdAt));
+  return c.json({ files }, 200);
+});
+
+app.post("/media", async (c) => {
+  const err = requireRole(c, ["super_admin"]);
+  if (err) return err;
+  const u = c.get("user")!;
+  try {
+    const formData = await c.req.formData();
+    const file = formData.get("file") as File | null;
+    if (!file) return c.json({ error: "No file provided" }, 400);
+    const MAX = 50 * 1024 * 1024; // 50 MB
+    if (file.size > MAX) return c.json({ error: "File too large (max 50 MB)" }, 400);
+    const ext = file.name.split(".").pop() ?? "bin";
+    const id = crypto.randomUUID();
+    const fileName = `${id}.${ext}`;
+    const dest = path.join(UPLOADS_DIR, fileName);
+    const buf = await file.arrayBuffer();
+    fs.writeFileSync(dest, Buffer.from(buf));
+    const category = getCategory(file.type, file.name);
+    await db().insert(schema.mediaFile).values({
+      id, originalName: file.name, fileName,
+      mimeType: file.type || "application/octet-stream",
+      size: file.size, category,
+      uploadedBy: u.id, uploadedByName: u.name,
+    });
+    return c.json({ success: true, id, fileName }, 200);
+  } catch (e: any) {
+    return c.json({ error: e?.message ?? "Upload failed" }, 500);
+  }
+});
+
+app.delete("/media/:id", async (c) => {
+  const err = requireRole(c, ["super_admin"]);
+  if (err) return err;
+  const id = c.req.param("id");
+  const [row] = await db().select().from(schema.mediaFile).where(eq(schema.mediaFile.id, id));
+  if (row) {
+    const filePath = path.join(UPLOADS_DIR, row.fileName);
+    try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch {}
+    await db().delete(schema.mediaFile).where(eq(schema.mediaFile.id, id));
+  }
+  return c.json({ success: true }, 200);
 });
 
 // ── Automation manual trigger ─────────────────────────────────────────

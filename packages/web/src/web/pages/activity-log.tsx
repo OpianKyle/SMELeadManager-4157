@@ -25,7 +25,7 @@ const ROLE_COLORS: Record<string, string> = {
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
-  admin: "Team Leader",
+  admin: "Distributor",
   agent: "Agent",
   viewer: "Viewer",
 };

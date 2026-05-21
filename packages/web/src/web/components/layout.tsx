@@ -11,6 +11,7 @@ const NAV = [
   { path: "/email-automation", label: "Email Automation", icon: "📧" },
   { path: "/users", label: "User Management", icon: "🔐", roles: ["super_admin", "admin"] },
   { path: "/activity-log", label: "Activity Log", icon: "📋", roles: ["super_admin", "admin"] },
+  { path: "/media", label: "Media Library", icon: "🖼️", roles: ["super_admin"] },
 ];
 
 const USER_CACHE_KEY = "masakhe_current_user";
@@ -220,7 +221,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   display: "inline-block", padding: "2px 8px", borderRadius: 10,
                   fontSize: 10, fontWeight: 700, letterSpacing: "0.5px", textTransform: "uppercase",
                   background: ROLE_COLORS[user.role] ?? "#5e708d", color: "#fff"
-                }}>{({ super_admin: "Super Admin", admin: "Team Leader", agent: "Agent", viewer: "Viewer" } as Record<string,string>)[user.role] ?? user.role}</span>
+                }}>{({ super_admin: "Super Admin", admin: "Distributor", agent: "Agent", viewer: "Viewer" } as Record<string,string>)[user.role] ?? user.role}</span>
               </div>
               <button onClick={handleSignOut} style={{
                 width: "100%", padding: "8px", background: "rgba(255,255,255,0.06)",

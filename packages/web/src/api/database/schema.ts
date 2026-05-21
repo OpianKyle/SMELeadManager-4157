@@ -134,6 +134,19 @@ export const googleToken = mysqlTable("google_token", {
   updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ── Media Files ──────────────────────────────────────────────────────
+export const mediaFile = mysqlTable("media_file", {
+  id: varchar("id", { length: 191 }).primaryKey(),
+  originalName: varchar("original_name", { length: 500 }).notNull(),
+  fileName: varchar("file_name", { length: 500 }).notNull(),
+  mimeType: varchar("mime_type", { length: 100 }).notNull(),
+  size: int("size").notNull(),
+  category: varchar("category", { length: 50 }),
+  uploadedBy: varchar("uploaded_by", { length: 191 }),
+  uploadedByName: varchar("uploaded_by_name", { length: 255 }),
+  createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 // ── Activity Log ─────────────────────────────────────────────────────
 export const activityLog = mysqlTable("activity_log", {
   id: varchar("id", { length: 191 }).primaryKey(),

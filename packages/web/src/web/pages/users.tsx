@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 
 const ROLES = [
   { value: "super_admin", label: "Super Admin", color: "#118849", desc: "Full access + user management" },
-  { value: "admin",       label: "Team Leader", color: "#0f326b", desc: "All features except user management" },
+  { value: "admin",       label: "Distributor", color: "#0f326b", desc: "All features except user management" },
   { value: "agent",       label: "Agent",       color: "#5e708d", desc: "Leads, workflow, send emails" },
   { value: "viewer",      label: "Viewer",      color: "#999",    desc: "Read-only access" },
 ];
