@@ -355,7 +355,7 @@ export async function runAutomationTick() {
           const m = log.stage?.match(/^campaign_(\d+)$/);
           if (m) {
             const num = parseInt(m[1]);
-            const sentAt = log.createdAt instanceof Date ? log.createdAt : new Date(log.createdAt as any);
+            const sentAt = log.sentAt instanceof Date ? log.sentAt : new Date(log.sentAt as any);
             sentCampaignSteps[num] = sentAt;
           }
         }
