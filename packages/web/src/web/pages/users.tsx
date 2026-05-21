@@ -289,7 +289,7 @@ export default function Users() {
                       padding: "3px 10px", borderRadius: 10, fontSize: 11, fontWeight: 700,
                       background: roleMeta?.color ?? "#eef2f6", color: "#fff",
                       textTransform: "uppercase", letterSpacing: "0.5px",
-                    }}>{u.role?.replace("_", " ")}</span>
+                    }}>{roleMeta?.label ?? u.role?.replace("_", " ")}</span>
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 13, color: "#5e708d" }}>{u.department ?? "—"}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, color: "#5e708d" }}>{u.phone ?? "—"}</td>
