@@ -571,7 +571,9 @@ import path from "path";
 import fs from "fs";
 
 const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+const CHUNKS_DIR  = path.join(process.cwd(), "public", "uploads", "_chunks");
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+if (!fs.existsSync(CHUNKS_DIR))  fs.mkdirSync(CHUNKS_DIR,  { recursive: true });
 
 function getCategory(mime: string, name: string): string {
   if (mime.startsWith("image/")) return "image";
@@ -617,6 +619,69 @@ app.post("/media", async (c) => {
     return c.json({ success: true, id, fileName }, 200);
   } catch (e: any) {
     return c.json({ error: e?.message ?? "Upload failed" }, 500);
+  }
+});
+
+// ── Chunked upload (for large files that exceed nginx body limit) ──────
+app.post("/media/chunk", async (c) => {
+  const err = requireRole(c, ["super_admin"]);
+  if (err) return err;
+  const u = c.get("user")!;
+  try {
+    const formData  = await c.req.formData();
+    const fileId      = formData.get("fileId")      as string;
+    const chunkIndex  = parseInt(formData.get("chunkIndex")  as string);
+    const totalChunks = parseInt(formData.get("totalChunks") as string);
+    const fileName    = formData.get("fileName")    as string;
+    const mimeType    = formData.get("mimeType")    as string ?? "";
+    const chunk       = formData.get("chunk")       as File | null;
+
+    if (!fileId || isNaN(chunkIndex) || isNaN(totalChunks) || !fileName || !chunk) {
+      return c.json({ error: "Missing required chunk fields" }, 400);
+    }
+
+    // Save this chunk to temp storage
+    const chunkPath = path.join(CHUNKS_DIR, `${fileId}_${chunkIndex}`);
+    fs.writeFileSync(chunkPath, Buffer.from(await chunk.arrayBuffer()));
+
+    // Count received chunks
+    const received = Array.from({ length: totalChunks }, (_, i) =>
+      fs.existsSync(path.join(CHUNKS_DIR, `${fileId}_${i}`))
+    ).filter(Boolean).length;
+
+    if (received < totalChunks) {
+      return c.json({ success: true, complete: false, received, total: totalChunks });
+    }
+
+    // All chunks received — assemble the file
+    const ext = fileName.split(".").pop() ?? "bin";
+    const finalFileName = `${fileId}.${ext}`;
+    const dest = path.join(UPLOADS_DIR, finalFileName);
+    const parts: Buffer[] = [];
+    for (let i = 0; i < totalChunks; i++) {
+      const p = path.join(CHUNKS_DIR, `${fileId}_${i}`);
+      parts.push(fs.readFileSync(p));
+      fs.unlinkSync(p);
+    }
+    fs.writeFileSync(dest, Buffer.concat(parts));
+
+    const totalSize = fs.statSync(dest).size;
+    const MAX = 200 * 1024 * 1024;
+    if (totalSize > MAX) {
+      fs.unlinkSync(dest);
+      return c.json({ error: "File too large (max 200 MB)" }, 400);
+    }
+
+    const category = getCategory(mimeType, fileName);
+    await db().insert(schema.mediaFile).values({
+      id: fileId, originalName: fileName, fileName: finalFileName,
+      mimeType: mimeType || "application/octet-stream",
+      size: totalSize, category,
+      uploadedBy: u.id, uploadedByName: u.name,
+    });
+    return c.json({ success: true, complete: true, id: fileId, fileName: finalFileName });
+  } catch (e: any) {
+    return c.json({ error: e?.message ?? "Chunk upload failed" }, 500);
   }
 });
 

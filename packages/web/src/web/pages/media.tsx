@@ -47,28 +47,62 @@ export default function Media() {
     });
   };
 
+  const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB — safely under nginx proxy limits
+
   const upload = async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
     setUploading(true);
     setUploadError("");
     let succeeded = 0;
     const errors: string[] = [];
+
     for (const file of Array.from(fileList)) {
-      setUploadProgress(`Uploading ${file.name}…`);
-      const form = new FormData();
-      form.append("file", file);
       try {
-        const res = await fetch("/api/media", { method: "POST", body: form, credentials: "include" });
-        if (res.ok) {
-          succeeded++;
+        if (file.size <= CHUNK_SIZE) {
+          // Small file — upload in one request
+          setUploadProgress(`Uploading ${file.name}…`);
+          const form = new FormData();
+          form.append("file", file);
+          const res = await fetch("/api/media", { method: "POST", body: form, credentials: "include" });
+          if (res.ok) {
+            succeeded++;
+          } else {
+            const data = await res.json().catch(() => ({ error: res.statusText }));
+            errors.push(`${file.name}: ${data.error ?? "Upload failed"}`);
+          }
         } else {
-          const data = await res.json().catch(() => ({ error: res.statusText }));
-          errors.push(`${file.name}: ${data.error ?? "Upload failed"}`);
+          // Large file — split into 1 MB chunks and reassemble on server
+          const fileId = crypto.randomUUID();
+          const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+          let failed = false;
+
+          for (let i = 0; i < totalChunks; i++) {
+            const pct = Math.round((i / totalChunks) * 100);
+            setUploadProgress(`Uploading ${file.name}… ${pct}%`);
+            const start = i * CHUNK_SIZE;
+            const chunk = file.slice(start, start + CHUNK_SIZE);
+            const form = new FormData();
+            form.append("fileId", fileId);
+            form.append("chunkIndex", String(i));
+            form.append("totalChunks", String(totalChunks));
+            form.append("fileName", file.name);
+            form.append("mimeType", file.type);
+            form.append("chunk", chunk, file.name);
+            const res = await fetch("/api/media/chunk", { method: "POST", body: form, credentials: "include" });
+            if (!res.ok) {
+              const data = await res.json().catch(() => ({ error: res.statusText }));
+              errors.push(`${file.name}: ${data.error ?? "Upload failed"}`);
+              failed = true;
+              break;
+            }
+          }
+          if (!failed) succeeded++;
         }
       } catch (e: any) {
         errors.push(`${file.name}: ${e?.message ?? "Network error"}`);
       }
     }
+
     setUploading(false);
     setUploadProgress("");
     if (errors.length > 0) setUploadError(errors.join(" · "));
