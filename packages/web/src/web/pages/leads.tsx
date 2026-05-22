@@ -258,10 +258,11 @@ function LeadDrawer({
               }}
             >📇 vCard</button>
             <button onClick={onClose} style={{
-              background: "rgba(255,255,255,0.12)", border: "none", color: "#fff",
-              borderRadius: 4, width: 32, height: 32, fontSize: 18, cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>×</button>
+              background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)",
+              color: "#fff", borderRadius: 4, padding: "0 12px", height: 32, fontSize: 12,
+              fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
+              whiteSpace: "nowrap",
+            }}>← Close</button>
           </div>
         </div>
 
