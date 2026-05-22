@@ -642,6 +642,9 @@ export default function Leads() {
   const [googleConfigured, setGoogleConfigured] = useState(false);
   const [syncing, setSyncing]   = useState(false);
   const [syncMsg, setSyncMsg]   = useState("");
+  const [page, setPage]         = useState(1);
+
+  const PAGE_SIZE = 25;
 
   const checkGoogleStatus = () =>
     api.get("/google/status").then(r => r.json()).then(d => {
@@ -751,6 +754,15 @@ export default function Leads() {
     return matchSearch && matchStage;
   });
 
+  const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage    = Math.min(page, totalPages);
+  const paginated   = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pageStart   = filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
+  const pageEnd     = Math.min(safePage * PAGE_SIZE, filtered.length);
+
+  // Reset to page 1 whenever the filter changes
+  useEffect(() => { setPage(1); }, [search, stageFilter]);
+
   return (
     <Layout>
       <style>{`
@@ -780,6 +792,66 @@ export default function Leads() {
           box-shadow: 0 1px 4px rgba(0,0,0,0.07);
           overflow: auto;
           -webkit-overflow-scrolling: touch;
+        }
+        .leads-table-wrap::-webkit-scrollbar {
+          height: 10px;
+          width: 10px;
+        }
+        .leads-table-wrap::-webkit-scrollbar-track {
+          background: #e8edf3;
+          border-radius: 0 0 4px 4px;
+        }
+        .leads-table-wrap::-webkit-scrollbar-thumb {
+          background: #5e708d;
+          border-radius: 5px;
+          border: 2px solid #e8edf3;
+        }
+        .leads-table-wrap::-webkit-scrollbar-thumb:hover {
+          background: #192943;
+        }
+        /* Pagination */
+        .leads-pagination {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 4px 4px;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .leads-pagination-info {
+          font-size: 13px;
+          color: #5e708d;
+        }
+        .leads-pagination-controls {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .pg-btn {
+          min-width: 32px;
+          height: 32px;
+          padding: 0 8px;
+          border: 1px solid #d1d9e0;
+          border-radius: 3px;
+          background: #fff;
+          color: #192943;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          font-family: 'Open Sans', Arial, sans-serif;
+          transition: background 0.1s, color 0.1s;
+        }
+        .pg-btn:hover:not(:disabled) {
+          background: #f0f3f7;
+        }
+        .pg-btn:disabled {
+          opacity: 0.4;
+          cursor: default;
+        }
+        .pg-btn.active {
+          background: #192943;
+          color: #fff;
+          border-color: #192943;
         }
         .leads-table {
           width: max-content;
@@ -959,7 +1031,7 @@ export default function Leads() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((l, i) => {
+            {paginated.map((l, i) => {
               const meta = STAGES.find(s => s.value === l.stage);
               const isSelected = selected?.id === l.id;
               return (
@@ -1030,7 +1102,7 @@ export default function Leads() {
                 </tr>
               );
             })}
-            {filtered.length === 0 && (
+            {paginated.length === 0 && (
               <tr><td colSpan={showCreatedBy ? 9 : 8} style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
                 No leads found. Add your first lead to get started.
               </td></tr>
@@ -1039,9 +1111,37 @@ export default function Leads() {
         </table>
       </div>
 
+      {/* Desktop pagination */}
+      {totalPages > 1 && (
+        <div className="leads-pagination">
+          <span className="leads-pagination-info">
+            Showing {pageStart}–{pageEnd} of {filtered.length} leads
+          </span>
+          <div className="leads-pagination-controls">
+            <button className="pg-btn" onClick={() => setPage(1)} disabled={safePage === 1}>«</button>
+            <button className="pg-btn" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>‹</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(p => p === 1 || p === totalPages || Math.abs(p - safePage) <= 2)
+              .reduce<(number | "…")[]>((acc, p, idx, arr) => {
+                if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push("…");
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((p, i) =>
+                p === "…"
+                  ? <span key={`ellipsis-${i}`} style={{ padding: "0 4px", color: "#5e708d", fontSize: 13 }}>…</span>
+                  : <button key={p} className={`pg-btn${safePage === p ? " active" : ""}`} onClick={() => setPage(p as number)}>{p}</button>
+              )
+            }
+            <button className="pg-btn" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>›</button>
+            <button className="pg-btn" onClick={() => setPage(totalPages)} disabled={safePage === totalPages}>»</button>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Cards */}
       <div className="leads-cards">
-        {filtered.map(l => {
+        {paginated.map(l => {
           const meta = STAGES.find(s => s.value === l.stage);
           const isSelected = selected?.id === l.id;
           return (
@@ -1100,12 +1200,40 @@ export default function Leads() {
             </div>
           );
         })}
-        {filtered.length === 0 && (
+        {paginated.length === 0 && (
           <div style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d", background: "#fff", borderRadius: 4 }}>
             No leads found. Add your first lead to get started.
           </div>
         )}
       </div>
+
+      {/* Mobile pagination */}
+      {totalPages > 1 && (
+        <div className="leads-pagination">
+          <span className="leads-pagination-info">
+            Showing {pageStart}–{pageEnd} of {filtered.length} leads
+          </span>
+          <div className="leads-pagination-controls">
+            <button className="pg-btn" onClick={() => setPage(1)} disabled={safePage === 1}>«</button>
+            <button className="pg-btn" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>‹</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(p => p === 1 || p === totalPages || Math.abs(p - safePage) <= 2)
+              .reduce<(number | "…")[]>((acc, p, idx, arr) => {
+                if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push("…");
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((p, i) =>
+                p === "…"
+                  ? <span key={`ellipsis-${i}`} style={{ padding: "0 4px", color: "#5e708d", fontSize: 13 }}>…</span>
+                  : <button key={p} className={`pg-btn${safePage === p ? " active" : ""}`} onClick={() => setPage(p as number)}>{p}</button>
+              )
+            }
+            <button className="pg-btn" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>›</button>
+            <button className="pg-btn" onClick={() => setPage(totalPages)} disabled={safePage === totalPages}>»</button>
+          </div>
+        </div>
+      )}
 
       {/* CRM Drawer */}
       {selected && (
