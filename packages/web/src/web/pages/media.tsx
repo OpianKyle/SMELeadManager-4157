@@ -47,7 +47,7 @@ export default function Media() {
     });
   };
 
-  const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB — safely under nginx proxy limits
+  const CHUNK_SIZE = 500 * 1024; // 500 KB — safely under nginx default 1 MB client_max_body_size
 
   const upload = async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
