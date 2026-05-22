@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 const CATEGORY_META: Record<string, { label: string; color: string; icon: string }> = {
   image: { label: "Image",       color: "#0369a1", icon: "🖼️" },
   video: { label: "Video",       color: "#7c3aed", icon: "🎬" },
+  audio: { label: "Audio",       color: "#d97706", icon: "🎵" },
   sheet: { label: "Spreadsheet", color: "#118849", icon: "📊" },
 };
 
@@ -24,6 +25,7 @@ export default function Media() {
   const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
+  const [uploadError, setUploadError] = useState("");
   const [filterCat, setFilterCat] = useState("");
   const [preview, setPreview] = useState<any>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -48,21 +50,28 @@ export default function Media() {
   const upload = async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
     setUploading(true);
+    setUploadError("");
     let succeeded = 0;
+    const errors: string[] = [];
     for (const file of Array.from(fileList)) {
       setUploadProgress(`Uploading ${file.name}…`);
       const form = new FormData();
       form.append("file", file);
       try {
         const res = await fetch("/api/media", { method: "POST", body: form, credentials: "include" });
-        if (res.ok) succeeded++;
-        else console.error("Upload failed:", await res.text());
-      } catch (e) {
-        console.error("Upload error:", e);
+        if (res.ok) {
+          succeeded++;
+        } else {
+          const data = await res.json().catch(() => ({ error: res.statusText }));
+          errors.push(`${file.name}: ${data.error ?? "Upload failed"}`);
+        }
+      } catch (e: any) {
+        errors.push(`${file.name}: ${e?.message ?? "Network error"}`);
       }
     }
     setUploading(false);
     setUploadProgress("");
+    if (errors.length > 0) setUploadError(errors.join(" · "));
     if (succeeded > 0) load();
   };
 
@@ -75,7 +84,7 @@ export default function Media() {
 
   const filtered = filterCat ? files.filter(f => f.category === filterCat) : files;
 
-  const counts = { image: 0, video: 0, sheet: 0 } as Record<string, number>;
+  const counts = { image: 0, video: 0, audio: 0, sheet: 0 } as Record<string, number>;
   files.forEach(f => { if (f.category) counts[f.category] = (counts[f.category] ?? 0) + 1; });
 
   return (
@@ -113,14 +122,22 @@ export default function Media() {
             }}>
               {uploading ? uploadProgress : "+ Upload Files"}
             </button>
-            <input ref={inputRef} type="file" multiple accept="image/*,video/*,.csv,.xlsx,.xls,.ods"
+            <input ref={inputRef} type="file" multiple accept="image/*,video/*,audio/*,.csv,.xlsx,.xls,.ods"
               style={{ display: "none" }} onChange={e => upload(e.target.files)} />
           </>
         )}
       </div>
 
+      {/* Upload error */}
+      {uploadError && (
+        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 4, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#dc2626" }}>
+          ⚠️ {uploadError}
+          <button onClick={() => setUploadError("")} style={{ marginLeft: 10, background: "none", border: "none", color: "#dc2626", cursor: "pointer", fontWeight: 700 }}>✕</button>
+        </div>
+      )}
+
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
         {Object.entries(CATEGORY_META).map(([key, m]) => (
           <div key={key} onClick={() => setFilterCat(filterCat === key ? "" : key)} style={{
             background: "#fff", borderRadius: 4, padding: "14px 16px",
@@ -148,7 +165,7 @@ export default function Media() {
           <div style={{ fontSize: 14, fontWeight: 600, color: "#192943", marginBottom: 4 }}>
             {dragOver ? "Drop to upload" : "Drag & drop files here, or click to browse"}
           </div>
-          <div style={{ fontSize: 12, color: "#5e708d" }}>Images, videos, CSV and Excel spreadsheets</div>
+          <div style={{ fontSize: 12, color: "#5e708d" }}>Images, videos, audio files, CSV and Excel spreadsheets</div>
           {uploading && <div style={{ marginTop: 12, fontSize: 13, color: "#118849", fontWeight: 600 }}>{uploadProgress}</div>}
         </div>
       )}
@@ -203,6 +220,12 @@ export default function Media() {
             {preview.category === "video" && (
               <video controls src={`/uploads/${preview.fileName}`}
                 style={{ maxWidth: "100%", maxHeight: "60vh", borderRadius: 4, display: "block", marginBottom: 16 }} />
+            )}
+            {preview.category === "audio" && (
+              <div style={{ background: "#fff9f0", borderRadius: 4, padding: "20px", marginBottom: 16, textAlign: "center" }}>
+                <div style={{ fontSize: 40, marginBottom: 12 }}>🎵</div>
+                <audio controls src={`/uploads/${preview.fileName}`} style={{ width: "100%" }} />
+              </div>
             )}
             {preview.category === "sheet" && (
               <div style={{ padding: "24px", textAlign: "center", background: "#eef2f6", borderRadius: 4, marginBottom: 16, fontSize: 40 }}>📊</div>

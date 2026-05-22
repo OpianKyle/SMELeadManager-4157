@@ -576,8 +576,11 @@ if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 function getCategory(mime: string, name: string): string {
   if (mime.startsWith("image/")) return "image";
   if (mime.startsWith("video/")) return "video";
+  if (mime.startsWith("audio/")) return "audio";
   const ext = name.split(".").pop()?.toLowerCase();
   if (["csv","xlsx","xls","ods"].includes(ext ?? "")) return "sheet";
+  if (["mp3","wav","ogg","aac","flac","m4a","wma","opus"].includes(ext ?? "")) return "audio";
+  if (["mp4","mov","avi","mkv","webm","wmv","flv"].includes(ext ?? "")) return "video";
   return "other";
 }
 
