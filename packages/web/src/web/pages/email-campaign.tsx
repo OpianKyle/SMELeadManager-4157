@@ -2,18 +2,13 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
 import { api } from "@/lib/api";
 
-function fmtDate(ts: any) {
-  if (!ts) return "—";
-  return new Date(ts).toLocaleDateString("en-ZA", { day: "2-digit", month: "short", year: "numeric" });
-}
-
 export default function EmailCampaign() {
   const [steps, setSteps] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
-  const [preview, setPreview] = useState<any>(null);
-  const [edits, setEdits] = useState<Record<string, { delayDays: string; subject: string; enabled: boolean }>>({});
+  const [modal, setModal] = useState<{ step: any; tab: "preview" | "edit" } | null>(null);
+  const [edits, setEdits] = useState<Record<string, { delayDays: string; subject: string; enabled: boolean; bodyHtml: string }>>({});
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
@@ -29,7 +24,7 @@ export default function EmailCampaign() {
       setSteps(d.steps ?? []);
       const init: Record<string, any> = {};
       for (const s of (d.steps ?? [])) {
-        init[s.id] = { delayDays: String(s.delayDays), subject: s.subject, enabled: !!s.enabled };
+        init[s.id] = { delayDays: String(s.delayDays), subject: s.subject, enabled: !!s.enabled, bodyHtml: s.bodyHtml ?? "" };
       }
       setEdits(init);
       setFetching(false);
@@ -44,7 +39,9 @@ export default function EmailCampaign() {
       delayDays: parseInt(e.delayDays) || 0,
       subject: e.subject,
       enabled: e.enabled,
+      bodyHtml: e.bodyHtml,
     });
+    setSteps(prev => prev.map(s => s.id === step.id ? { ...s, bodyHtml: e.bodyHtml, subject: e.subject, delayDays: parseInt(e.delayDays) || 0, enabled: e.enabled } : s));
     setSaving(s => ({ ...s, [step.id]: false }));
     setSaved(s => ({ ...s, [step.id]: true }));
     setTimeout(() => setSaved(s => ({ ...s, [step.id]: false })), 1500);
@@ -59,7 +56,6 @@ export default function EmailCampaign() {
 
   const enabledCount = steps.filter(s => edits[s.id]?.enabled ?? s.enabled).length;
 
-  // Build cumulative day schedule for display
   const cumDays: number[] = [];
   let total = 0;
   for (const s of steps) {
@@ -68,6 +64,9 @@ export default function EmailCampaign() {
     total += delay;
     cumDays.push(total);
   }
+
+  const modalStep = modal?.step;
+  const modalEdit = modalStep ? edits[modalStep.id] : null;
 
   return (
     <Layout>
@@ -89,16 +88,26 @@ export default function EmailCampaign() {
         .ec-save-btn:disabled { opacity:0.6; cursor:not-allowed; }
         .toggle-pill { position:relative; width:36px; height:20px; flex-shrink:0; cursor:pointer; }
         .toggle-pill input { opacity:0; width:0; height:0; position:absolute; }
-        .toggle-track { position:absolute; inset:0; border-radius:10px; transition:background 0.15s;
-          background:#d1d9e0; }
+        .toggle-track { position:absolute; inset:0; border-radius:10px; transition:background 0.15s; background:#d1d9e0; }
         .toggle-pill input:checked + .toggle-track { background:#118849; }
         .toggle-track:before { content:""; position:absolute; width:14px; height:14px; border-radius:50%;
           background:#fff; top:3px; left:3px; transition:transform 0.15s; }
         .toggle-pill input:checked + .toggle-track:before { transform:translateX(16px); }
-        .preview-overlay { position:fixed;inset:0;background:rgba(15,50,107,0.8);
+        .ec-overlay { position:fixed;inset:0;background:rgba(15,50,107,0.8);
           display:flex;align-items:center;justify-content:center;z-index:300; }
-        .preview-inner { background:#fff;border-radius:6px;max-width:680px;width:90vw;
-          max-height:85vh;overflow:auto;position:relative; }
+        .ec-modal { background:#fff;border-radius:6px;width:90vw;max-width:780px;
+          max-height:90vh;display:flex;flex-direction:column;position:relative; }
+        .ec-modal-header { padding:16px 20px;border-bottom:1px solid #eef2f6;
+          display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+        .ec-modal-tabs { display:flex;gap:0;border-bottom:1px solid #eef2f6;flex-shrink:0; }
+        .ec-tab { padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;border:none;
+          background:none;font-family:'Open Sans',Arial,sans-serif;color:#5e708d;
+          border-bottom:2px solid transparent;margin-bottom:-1px; }
+        .ec-tab.active { color:#0f326b;border-bottom-color:#0f326b; }
+        .ec-modal-body { flex:1;overflow:auto; }
+        .ec-body-textarea { width:100%;height:100%;min-height:360px;padding:16px;
+          font-family:'Courier New',monospace;font-size:12px;line-height:1.6;
+          border:none;outline:none;resize:none;color:#192943; }
         @media(max-width:700px){
           .ec-row { flex-wrap:wrap; }
           .ec-subject-input { width:100%; }
@@ -124,10 +133,7 @@ export default function EmailCampaign() {
             }}>Disable All</button>
           </div>
         ) : (
-          <span style={{
-            padding:"6px 14px", background:"#eef2f6", borderRadius:3,
-            fontSize:12, fontWeight:600, color:"#5e708d",
-          }}>View only</span>
+          <span style={{ padding:"6px 14px", background:"#eef2f6", borderRadius:3, fontSize:12, fontWeight:600, color:"#5e708d" }}>View only</span>
         )}
       </div>
 
@@ -150,20 +156,21 @@ export default function EmailCampaign() {
         <div style={{ width:60, flexShrink:0, textAlign:"center" }}>Delay</div>
         <div style={{ width:50, flexShrink:0, textAlign:"center" }}>Day</div>
         <div style={{ flex:1 }}>Subject Line</div>
-        <div style={{ width:70, flexShrink:0 }}>Preview</div>
-        {canEdit && <div style={{ width:70, flexShrink:0 }}>Save</div>}
+        <div style={{ width:canEdit ? 60 : 70, flexShrink:0 }}>{canEdit ? "Preview" : "Preview"}</div>
+        {canEdit && <div style={{ width:60, flexShrink:0 }}>Edit Body</div>}
+        {canEdit && <div style={{ width:60, flexShrink:0 }}>Save</div>}
       </div>
 
       {fetching ? (
         <div style={{ textAlign:"center", padding:40, color:"#5e708d" }}>Loading…</div>
       ) : (
         steps.map((step, i) => {
-          const e = edits[step.id] ?? { delayDays: String(step.delayDays), subject: step.subject, enabled: !!step.enabled };
+          const e = edits[step.id] ?? { delayDays: String(step.delayDays), subject: step.subject, enabled: !!step.enabled, bodyHtml: step.bodyHtml ?? "" };
           const isEnabled = e.enabled;
           const isSaving = saving[step.id];
           const isSaved = saved[step.id];
           const dayLabel = cumDays[i] === 0 ? "Same day" : `Day ${cumDays[i]}`;
-          const isDirty = e.delayDays !== String(step.delayDays) || e.subject !== step.subject || e.enabled !== !!step.enabled;
+          const isDirty = e.delayDays !== String(step.delayDays) || e.subject !== step.subject || e.enabled !== !!step.enabled || e.bodyHtml !== (step.bodyHtml ?? "");
 
           return (
             <div key={step.id} className={`ec-row${!isEnabled ? " disabled" : ""}`}>
@@ -196,15 +203,23 @@ export default function EmailCampaign() {
                 onChange={v => canEdit && setEdits(d => ({ ...d, [step.id]: { ...d[step.id], subject: v.target.value } }))} />
 
               {/* Preview */}
-              <button onClick={() => setPreview(step)} style={{
-                width:70, padding:"5px 0", background:"#eef2f6", color:"#0f326b", border:"none",
+              <button onClick={() => setModal({ step, tab: "preview" })} style={{
+                width: canEdit ? 60 : 70, padding:"5px 0", background:"#eef2f6", color:"#0f326b", border:"none",
                 borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
               }}>Preview</button>
 
-              {/* Save — only for super_admin */}
+              {/* Edit Body — super admin only */}
+              {canEdit && (
+                <button onClick={() => setModal({ step, tab: "edit" })} style={{
+                  width:60, padding:"5px 0", background:"#fff3cd", color:"#92660a", border:"1px solid #fde68a",
+                  borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
+                }}>Edit</button>
+              )}
+
+              {/* Save — super admin only */}
               {canEdit && (
                 <button onClick={() => save(step)} disabled={isSaving || !isDirty} className="ec-save-btn" style={{
-                  width:70, background: isSaved ? "#118849" : isDirty ? "#118849" : "#d1d9e0",
+                  width:60, background: isSaved ? "#118849" : isDirty ? "#118849" : "#d1d9e0",
                   color: isDirty || isSaved ? "#fff" : "#9eafc2",
                 }}>
                   {isSaved ? "Saved ✓" : isSaving ? "…" : "Save"}
@@ -221,7 +236,7 @@ export default function EmailCampaign() {
           boxShadow:"0 1px 4px rgba(0,0,0,0.07)" }}>
           <div style={{ fontSize:13, fontWeight:700, color:"#192943", marginBottom:10 }}>Campaign Timeline Summary</div>
           <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:4 }}>
-            {steps.filter((s, i) => edits[s.id]?.enabled ?? s.enabled).map((s, i) => {
+            {steps.filter(s => edits[s.id]?.enabled ?? s.enabled).map(s => {
               const idx = steps.indexOf(s);
               return (
                 <div key={s.id} style={{ flexShrink:0, textAlign:"center" }}>
@@ -241,25 +256,67 @@ export default function EmailCampaign() {
         </div>
       )}
 
-      {/* Preview modal */}
-      {preview && (
-        <div className="preview-overlay" onClick={() => setPreview(null)}>
-          <div className="preview-inner" onClick={e => e.stopPropagation()}>
-            <div style={{ padding:"16px 20px", borderBottom:"1px solid #eef2f6", display:"flex",
-              alignItems:"center", justifyContent:"space-between" }}>
+      {/* Preview / Edit modal */}
+      {modal && modalEdit && (
+        <div className="ec-overlay" onClick={() => setModal(null)}>
+          <div className="ec-modal" onClick={e => e.stopPropagation()}>
+
+            {/* Modal header */}
+            <div className="ec-modal-header">
               <div>
-                <div style={{ fontSize:11, color:"#9eafc2", fontWeight:700, textTransform:"uppercase",
-                  letterSpacing:"0.5px", marginBottom:4 }}>Email {preview.stepNumber} Preview</div>
+                <div style={{ fontSize:11, color:"#9eafc2", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>
+                  Email {modalStep.stepNumber}
+                </div>
                 <div style={{ fontSize:14, fontWeight:700, color:"#192943" }}>
-                  {edits[preview.id]?.subject ?? preview.subject}
+                  {modalEdit.subject || modalStep.subject}
                 </div>
               </div>
-              <button onClick={() => setPreview(null)} style={{
-                background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#5e708d", lineHeight:1,
-              }}>×</button>
+              <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                {canEdit && (
+                  <button onClick={() => save(modalStep)} style={{
+                    padding:"6px 16px", background:"#118849", color:"#fff", border:"none",
+                    borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
+                  }}>Save Changes</button>
+                )}
+                <button onClick={() => setModal(null)} style={{
+                  background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#5e708d", lineHeight:1,
+                }}>×</button>
+              </div>
             </div>
-            <div style={{ padding:20 }}
-              dangerouslySetInnerHTML={{ __html: preview.bodyHtml }} />
+
+            {/* Tabs */}
+            <div className="ec-modal-tabs">
+              <button className={`ec-tab${modal.tab === "preview" ? " active" : ""}`}
+                onClick={() => setModal(m => m ? { ...m, tab: "preview" } : m)}>
+                Preview
+              </button>
+              {canEdit && (
+                <button className={`ec-tab${modal.tab === "edit" ? " active" : ""}`}
+                  onClick={() => setModal(m => m ? { ...m, tab: "edit" } : m)}>
+                  Edit HTML Body
+                </button>
+              )}
+            </div>
+
+            {/* Tab body */}
+            <div className="ec-modal-body">
+              {modal.tab === "preview" ? (
+                <div style={{ padding:20 }}
+                  dangerouslySetInnerHTML={{ __html: modalEdit.bodyHtml || modalStep.bodyHtml }} />
+              ) : (
+                <textarea
+                  className="ec-body-textarea"
+                  value={modalEdit.bodyHtml}
+                  onChange={v => setEdits(d => ({
+                    ...d,
+                    [modalStep.id]: { ...d[modalStep.id], bodyHtml: v.target.value },
+                  }))}
+                  spellCheck={false}
+                  placeholder="Enter HTML body…"
+                />
+              )}
+            </div>
+
           </div>
         </div>
       )}

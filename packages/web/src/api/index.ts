@@ -785,6 +785,7 @@ app.put("/campaign-steps/:id", async (c) => {
   if (body.delayDays !== undefined) update.delayDays = Math.max(0, parseInt(body.delayDays) || 0);
   if (body.enabled !== undefined) update.enabled = !!body.enabled;
   if (body.subject !== undefined && body.subject.trim()) update.subject = body.subject.trim();
+  if (body.bodyHtml !== undefined && body.bodyHtml.trim()) update.bodyHtml = body.bodyHtml.trim();
   update.updatedAt = new Date();
   await db().update(schema.emailCampaignStep).set(update).where(eq(schema.emailCampaignStep.id, id));
   return c.json({ success: true }, 200);
