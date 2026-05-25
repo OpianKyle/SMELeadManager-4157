@@ -1,0 +1,540 @@
+[automation] Engine started — ticking every 5 minutes
+[migration] Failed query: ALTER TABLE `user` ADD COLUMN `manager_id` VARCHAR(191) NULL
+params: 
+[migration] Failed query: ALTER TABLE `lead` ADD COLUMN `created_by` VARCHAR(191) NULL
+params: 
+[migration] Failed query: ALTER TABLE `user` ADD COLUMN `permissions` VARCHAR(1000) NULL
+params: 
+[seed] campaign step 1 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 0b5352bf-dfd9-4128-be85-a164e659c703,1,One platform. Everything your SMME needs.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">The All-in-One Business Platform for South African SMMEs</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Running a small business means juggling a dozen tools. <strong>Masakhe</strong> brings them all together — website, invoices, payroll, CRM, social media, and finances. No more jumping between tabs.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Claim your <strong>14-day free trial</strong> and see the difference.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,0,true
+[seed] campaign step 2 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 529c707c-6217-44c1-b6fc-38d2df047f21,2,Your website, live in minutes (no developer needed),
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">AI Website Builder — Drag, Drop, Go Live</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">With Masakhe's AI website builder you get a free <strong>drag-and-drop website builder</strong>. Edit with the WYSIWYG editor and post live! Professional, fast, and mobile-friendly — perfect for South African SMMEs.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Build yours <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 3 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 7dca7f8e-1469-4137-b611-1ceef377706e,3,Stop chasing payments. Start sending professional invoices.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Invoicing That Gets You Paid Faster</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Choose from multiple templates, add your logo, and send <strong>quotes and invoices in minutes</strong> from your dashboard. Track what's paid and what's overdue — all in one place.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Try it <strong>free for two weeks</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 4 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: db101e66-6569-4f40-92cb-c22c2576dc02,4,Payroll headaches? Not anymore.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Payroll Made Simple</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Generate payslips, <strong>auto-calculate deductions</strong>, and manage employee records without spreadsheets. Masakhe handles the numbers so you can focus on your team.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Test payroll with your <strong>free trial</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 5 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 01a27ddc-b6fb-4d58-898c-8e38cdaeeb79,5,Never lose a lead again.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Client Management (CRM) Built-In</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Keep all client conversations, documents, and history in one place. Masakhe's CRM helps you <strong>nurture relationships and close deals faster</strong> — custom built for you at no extra cost.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Experience the CRM <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 6 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 5e385de0-d1db-460c-a8f0-aaea87089ee8,6,Plan a week of posts in minutes.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Social Media Scheduling — Done in Minutes</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Create, download and post to <strong>all your social channels</strong> from Masakhe in minutes. No more last-minute rushes or forgotten posts — just consistent engagement.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Start scheduling <strong>free today</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 7 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 451562b3-0dd3-407a-9d6a-6a5a6b065c58,7,Know exactly where every rand goes.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Financial Transaction Tracking</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Link your transactions, track expenses, and see your <strong>cash flow at a glance</strong>. Masakhe gives you the financial clarity every SMME needs to grow.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">See it in action with a <strong>free trial</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 8 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 697a1023-4541-47fc-8419-37f370a425fd,8,Reclaim your time. Let Masakhe do the busy work.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Save Hours Every Week</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Imagine not switching between six different apps. Masakhe <strong>automates invoicing, payroll, social media, and more</strong> — so you can focus on serving customers.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Try the time-saver <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 9 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: de6cdcf2-28af-4af9-8961-e49c551aaa6e,9,Stop paying for 5 separate tools.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Cut Costs — One Platform Instead of Many</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Website builder + invoicing + payroll + CRM + social scheduler = thousands of rands. <strong>Masakhe combines them all from R899/month</strong> after trial.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">First <strong>14 days are on us</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 10 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 71627d1a-bada-4ed8-becb-f431335741c9,10,Small business, big brand impression.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Look Professional, Win More Business</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">A sleek website, branded invoices, and organised client management make you look like a market leader. Masakhe gives you that <strong>polished image without the high cost</strong>.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Build your professional presence <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 11 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 64f9137e-f786-4841-8028-7e659db02226,11,Designed for South African SMMEs – easy for everyone.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">No Tech Skills? No Problem.</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Drag, drop, click, done. Masakhe's interface is <strong>intuitive, with guided steps for every feature</strong>. You don't need an IT degree to run your business like a pro.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Prove it to yourself — <strong>free trial</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 12 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: f04470dc-05d0-4353-b1c5-ded667eba6ca,12,A free trial that's actually free.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Zero Risk, Zero Credit Card</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;"><strong>No credit card required. No hidden fees.</strong> Just 14 full days of access to everything Masakhe offers. If you love it, upgrade later. If not, walk away.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Start your <strong>risk-free trial today</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 13 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 100ea967-3b07-429a-a5b7-497c6d9712ed,13,Your 14-day roadmap to a smoother business.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">The First 14 Days: What to Try</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;"><strong>Day 1:</strong> Build your AI website. <strong>Day 3:</strong> Send an invoice. <strong>Day 5:</strong> Schedule social posts. <strong>Day 7:</strong> Run payroll. By day 14, you'll wonder how you managed without Masakhe.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Get the full roadmap — <strong>start free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 14 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: edbd1dab-a74c-4d66-8c46-79adb99a72cc,14,Stop juggling. Start managing.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">From Chaos to Control</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">When your clients, finances, and team are all in one place, running your business becomes <strong>calm and clear</strong>. Masakhe brings order to the chaos.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Experience control <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 15 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 62bc84d3-c344-41f2-93fb-c85e323ed75e,15,Your business is ready to scale. Is your software?,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Grow Without Growing Pains</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Masakhe grows with you. Add more clients, more employees, more social accounts — the platform handles it all. <strong>No need to switch tools when you level up.</strong></p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Test the scalability <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 16 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: f4d19d6e-2f5f-4354-a7e3-d00c76eb98b6,16,Local taxes. Local rules. Local support.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Built for South African SMMEs</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Masakhe understands <strong>SARS payroll requirements</strong>, local invoice regulations, and the way you do business. Not a generic international tool — <strong>made for you</strong>.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Try the local advantage <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 17 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: b6a0776f-ebe0-42ee-90b3-bbf6a2fd7882,17,Sleep better knowing your business data is protected.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Your Data, Safe and Secure</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">We take security seriously. Your client info, payroll records, and financial data are <strong>encrypted and backed up</strong>. So you can focus on growing, not worrying.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">See our security features <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 18 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: ee54f6ad-67c3-4f21-9dcf-b10420ae2da3,18,The dashboard that does it all.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">One Login. Full Control.</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Log in once. From one dashboard, manage your website, send invoices, run payroll, talk to clients, schedule posts, and track money. <strong>That's the Masakhe power.</strong></p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Experience total control <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 19 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: bb905c55-e18d-4aee-b5eb-2597820399d9,19,Join hundreds of South African businesses already saving time.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Real SMMEs, Real Results</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;"><em>&ldquo;Masakhe cut my admin by 70%.&rdquo;</em> &nbsp; <em>&ldquo;I built my site in 10 minutes.&rdquo;</em> &nbsp; <em>&ldquo;Finally, one tool for everything.&rdquo;</em></p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Don't just take our word for it. <strong>Join them — start your free trial.</strong></p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 20 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 8feebff7-3f01-4d05-8a56-d9b8f50aa48e,20,Don't let another week slip away.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Last Chance: Your Free Trial Awaits</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Every day you wait is another day of juggling spreadsheets, missed social posts, and late invoices. <strong>Your 14-day free trial is ready — claim it now.</strong></p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial Now →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[invite] Failed to send invite email: auth.api.forgetPassword is not a function. (In 'auth.api.forgetPassword({
+          body: { email, redirectTo: `${baseURL}/reset-password` }
+        })', 'auth.api.forgetPassword' is undefined)
+7:11:26 AM [vite] (client) hmr update /src/web/styles.css
+7:11:26 AM [vite] (ssr) page reload src/api/index.ts
+[automation] Engine started — ticking every 5 minutes
+[migration] Failed query: ALTER TABLE `user` ADD COLUMN `manager_id` VARCHAR(191) NULL
+params: 
+[migration] Failed query: ALTER TABLE `lead` ADD COLUMN `created_by` VARCHAR(191) NULL
+params: 
+[migration] Failed query: ALTER TABLE `user` ADD COLUMN `permissions` VARCHAR(1000) NULL
+params: 
+[seed] campaign step 1 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 95ba5421-3263-4647-86c5-c235b1bf16a0,1,One platform. Everything your SMME needs.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">The All-in-One Business Platform for South African SMMEs</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Running a small business means juggling a dozen tools. <strong>Masakhe</strong> brings them all together — website, invoices, payroll, CRM, social media, and finances. No more jumping between tabs.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Claim your <strong>14-day free trial</strong> and see the difference.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,0,true
+[seed] campaign step 2 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 0b62b51a-c97c-4fb7-89e6-b6032c48ae4b,2,Your website, live in minutes (no developer needed),
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">AI Website Builder — Drag, Drop, Go Live</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">With Masakhe's AI website builder you get a free <strong>drag-and-drop website builder</strong>. Edit with the WYSIWYG editor and post live! Professional, fast, and mobile-friendly — perfect for South African SMMEs.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Build yours <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 3 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 974fb08a-29c1-4b25-9a76-3c0173b9f2a6,3,Stop chasing payments. Start sending professional invoices.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Invoicing That Gets You Paid Faster</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Choose from multiple templates, add your logo, and send <strong>quotes and invoices in minutes</strong> from your dashboard. Track what's paid and what's overdue — all in one place.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Try it <strong>free for two weeks</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 4 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: ce9815ab-e0d2-47ed-8709-71d950678948,4,Payroll headaches? Not anymore.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Payroll Made Simple</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Generate payslips, <strong>auto-calculate deductions</strong>, and manage employee records without spreadsheets. Masakhe handles the numbers so you can focus on your team.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Test payroll with your <strong>free trial</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 5 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 99509e2a-9754-42f1-ba47-65730a45b30b,5,Never lose a lead again.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Client Management (CRM) Built-In</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Keep all client conversations, documents, and history in one place. Masakhe's CRM helps you <strong>nurture relationships and close deals faster</strong> — custom built for you at no extra cost.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Experience the CRM <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 6 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 5684b0ab-0ab4-4304-88ae-ddd697bad80c,6,Plan a week of posts in minutes.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Social Media Scheduling — Done in Minutes</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Create, download and post to <strong>all your social channels</strong> from Masakhe in minutes. No more last-minute rushes or forgotten posts — just consistent engagement.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Start scheduling <strong>free today</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 7 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 1cb9be43-834a-4717-bd04-8812459abf26,7,Know exactly where every rand goes.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Financial Transaction Tracking</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Link your transactions, track expenses, and see your <strong>cash flow at a glance</strong>. Masakhe gives you the financial clarity every SMME needs to grow.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">See it in action with a <strong>free trial</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 8 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: e168aefc-6b21-4405-8477-c570e235a4c9,8,Reclaim your time. Let Masakhe do the busy work.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Save Hours Every Week</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Imagine not switching between six different apps. Masakhe <strong>automates invoicing, payroll, social media, and more</strong> — so you can focus on serving customers.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Try the time-saver <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 9 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 7fb1afe2-bd4a-47e4-a872-d16a228dda9d,9,Stop paying for 5 separate tools.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Cut Costs — One Platform Instead of Many</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Website builder + invoicing + payroll + CRM + social scheduler = thousands of rands. <strong>Masakhe combines them all from R899/month</strong> after trial.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">First <strong>14 days are on us</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 10 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: f636bd2d-c851-4a51-bb2f-0c163045312a,10,Small business, big brand impression.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Look Professional, Win More Business</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">A sleek website, branded invoices, and organised client management make you look like a market leader. Masakhe gives you that <strong>polished image without the high cost</strong>.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Build your professional presence <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 11 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 1bef3f00-d524-4e69-b828-16ee60750006,11,Designed for South African SMMEs – easy for everyone.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">No Tech Skills? No Problem.</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Drag, drop, click, done. Masakhe's interface is <strong>intuitive, with guided steps for every feature</strong>. You don't need an IT degree to run your business like a pro.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Prove it to yourself — <strong>free trial</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 12 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: dabb4725-bac2-4bde-afc3-8fdb6e5e860c,12,A free trial that's actually free.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Zero Risk, Zero Credit Card</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;"><strong>No credit card required. No hidden fees.</strong> Just 14 full days of access to everything Masakhe offers. If you love it, upgrade later. If not, walk away.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Start your <strong>risk-free trial today</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 13 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 272bc1b0-735a-46e5-b9a3-08d0a8b274db,13,Your 14-day roadmap to a smoother business.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">The First 14 Days: What to Try</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;"><strong>Day 1:</strong> Build your AI website. <strong>Day 3:</strong> Send an invoice. <strong>Day 5:</strong> Schedule social posts. <strong>Day 7:</strong> Run payroll. By day 14, you'll wonder how you managed without Masakhe.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Get the full roadmap — <strong>start free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 14 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 2f4d26d9-5b32-48ce-ac4a-723cf36f63d9,14,Stop juggling. Start managing.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">From Chaos to Control</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">When your clients, finances, and team are all in one place, running your business becomes <strong>calm and clear</strong>. Masakhe brings order to the chaos.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Experience control <strong>free for 14 days</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 15 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: be7a5540-5e87-4310-ace6-b45c3a5a9a6c,15,Your business is ready to scale. Is your software?,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Grow Without Growing Pains</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Masakhe grows with you. Add more clients, more employees, more social accounts — the platform handles it all. <strong>No need to switch tools when you level up.</strong></p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Test the scalability <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 16 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 6ad9781a-d432-464b-89f3-a920345a6eb0,16,Local taxes. Local rules. Local support.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Built for South African SMMEs</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Masakhe understands <strong>SARS payroll requirements</strong>, local invoice regulations, and the way you do business. Not a generic international tool — <strong>made for you</strong>.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Try the local advantage <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 17 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 0f64a26b-d120-4823-a363-2a9e1ec27ef3,17,Sleep better knowing your business data is protected.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Your Data, Safe and Secure</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">We take security seriously. Your client info, payroll records, and financial data are <strong>encrypted and backed up</strong>. So you can focus on growing, not worrying.</p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">See our security features <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 18 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 4973cef5-e2ef-4917-ba84-56c639e0fb61,18,The dashboard that does it all.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">One Login. Full Control.</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Log in once. From one dashboard, manage your website, send invoices, run payroll, talk to clients, schedule posts, and track money. <strong>That's the Masakhe power.</strong></p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Experience total control <strong>free</strong>.</p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 19 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 0409ebf2-41cc-4f1b-8218-a6152c4546d0,19,Join hundreds of South African businesses already saving time.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Real SMMEs, Real Results</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;"><em>&ldquo;Masakhe cut my admin by 70%.&rdquo;</em> &nbsp; <em>&ldquo;I built my site in 10 minutes.&rdquo;</em> &nbsp; <em>&ldquo;Finally, one tool for everything.&rdquo;</em></p><p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Don't just take our word for it. <strong>Join them — start your free trial.</strong></p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[seed] campaign step 20 Failed query: insert into `email_campaign_step` (`id`, `step_number`, `subject`, `body_html`, `delay_days`, `enabled`, `updated_at`) values (?, ?, ?, ?, ?, ?, default)
+params: 3a16fe9d-d01a-4e41-bc75-847c915fa9ee,20,Don't let another week slip away.,
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Last Chance: Your Free Trial Awaits</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">Every day you wait is another day of juggling spreadsheets, missed social posts, and late invoices. <strong>Your 14-day free trial is ready — claim it now.</strong></p>
+    <div style="text-align:center;margin:28px 0 0;">
+      <a href="https://www.masakheportal.co.za/register" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:3px;">Start Your Free Trial Now →</a>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#9eafc2;text-align:center;margin:16px 0 0;">
+      👉 <a href="https://www.masakheportal.co.za/register" style="color:#118849;">www.masakheportal.co.za/register</a>
+    </p>
+  ,2,true
+[invite] Sent invite email to kylemcb.24@gmail.com
