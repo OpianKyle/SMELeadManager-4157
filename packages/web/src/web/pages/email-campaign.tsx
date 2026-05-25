@@ -14,8 +14,14 @@ export default function EmailCampaign() {
   const [saved, setSaved] = useState<Record<string, boolean>>({});
   const [preview, setPreview] = useState<any>(null);
   const [edits, setEdits] = useState<Record<string, { delayDays: string; subject: string; enabled: boolean }>>({});
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    api.get("/me").then(r => r.json()).then(d => setCurrentUser(d.user));
+  }, []);
+
+  const canEdit = currentUser?.role === "super_admin";
 
   const load = () => {
     setFetching(true);
@@ -106,16 +112,23 @@ export default function EmailCampaign() {
             {enabledCount} of {steps.length} emails enabled · Each email sends automatically after the configured delay
           </p>
         </div>
-        <div style={{ display:"flex", gap:8 }}>
-          <button onClick={() => toggleAll(true)} style={{
-            padding:"8px 16px", background:"#0f326b", color:"#fff", border:"none",
-            borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
-          }}>Enable All</button>
-          <button onClick={() => toggleAll(false)} style={{
-            padding:"8px 16px", background:"#eef2f6", color:"#5e708d", border:"1px solid #d1d9e0",
-            borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
-          }}>Disable All</button>
-        </div>
+        {canEdit ? (
+          <div style={{ display:"flex", gap:8 }}>
+            <button onClick={() => toggleAll(true)} style={{
+              padding:"8px 16px", background:"#0f326b", color:"#fff", border:"none",
+              borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
+            }}>Enable All</button>
+            <button onClick={() => toggleAll(false)} style={{
+              padding:"8px 16px", background:"#eef2f6", color:"#5e708d", border:"1px solid #d1d9e0",
+              borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
+            }}>Disable All</button>
+          </div>
+        ) : (
+          <span style={{
+            padding:"6px 14px", background:"#eef2f6", borderRadius:3,
+            fontSize:12, fontWeight:600, color:"#5e708d",
+          }}>View only</span>
+        )}
       </div>
 
       {/* Legend */}
@@ -138,7 +151,7 @@ export default function EmailCampaign() {
         <div style={{ width:50, flexShrink:0, textAlign:"center" }}>Day</div>
         <div style={{ flex:1 }}>Subject Line</div>
         <div style={{ width:70, flexShrink:0 }}>Preview</div>
-        <div style={{ width:70, flexShrink:0 }}>Save</div>
+        {canEdit && <div style={{ width:70, flexShrink:0 }}>Save</div>}
       </div>
 
       {fetching ? (
@@ -157,17 +170,18 @@ export default function EmailCampaign() {
               <div className="ec-num">{step.stepNumber}</div>
 
               {/* Toggle */}
-              <label className="toggle-pill">
-                <input type="checkbox" checked={isEnabled}
-                  onChange={v => setEdits(d => ({ ...d, [step.id]: { ...d[step.id], enabled: v.target.checked } }))} />
+              <label className="toggle-pill" style={{ cursor: canEdit ? "pointer" : "default", opacity: canEdit ? 1 : 0.6 }}>
+                <input type="checkbox" checked={isEnabled} disabled={!canEdit}
+                  onChange={v => canEdit && setEdits(d => ({ ...d, [step.id]: { ...d[step.id], enabled: v.target.checked } }))} />
                 <span className="toggle-track" />
               </label>
 
               {/* Delay */}
               <div style={{ display:"flex", alignItems:"center", gap:4, flexShrink:0 }}>
                 <input type="number" min={0} max={365} className="ec-delay-input"
-                  value={e.delayDays}
-                  onChange={v => setEdits(d => ({ ...d, [step.id]: { ...d[step.id], delayDays: v.target.value } }))} />
+                  value={e.delayDays} readOnly={!canEdit}
+                  style={{ cursor: canEdit ? undefined : "default", background: canEdit ? undefined : "#f8fafc" }}
+                  onChange={v => canEdit && setEdits(d => ({ ...d, [step.id]: { ...d[step.id], delayDays: v.target.value } }))} />
                 <span style={{ fontSize:11, color:"#9eafc2" }}>d</span>
               </div>
 
@@ -177,8 +191,9 @@ export default function EmailCampaign() {
               </div>
 
               {/* Subject */}
-              <input type="text" className="ec-subject-input" value={e.subject}
-                onChange={v => setEdits(d => ({ ...d, [step.id]: { ...d[step.id], subject: v.target.value } }))} />
+              <input type="text" className="ec-subject-input" value={e.subject} readOnly={!canEdit}
+                style={{ cursor: canEdit ? undefined : "default", background: canEdit ? undefined : "#f8fafc" }}
+                onChange={v => canEdit && setEdits(d => ({ ...d, [step.id]: { ...d[step.id], subject: v.target.value } }))} />
 
               {/* Preview */}
               <button onClick={() => setPreview(step)} style={{
@@ -186,13 +201,15 @@ export default function EmailCampaign() {
                 borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"'Open Sans',Arial,sans-serif",
               }}>Preview</button>
 
-              {/* Save */}
-              <button onClick={() => save(step)} disabled={isSaving || !isDirty} className="ec-save-btn" style={{
-                width:70, background: isSaved ? "#118849" : isDirty ? "#118849" : "#d1d9e0",
-                color: isDirty || isSaved ? "#fff" : "#9eafc2",
-              }}>
-                {isSaved ? "Saved ✓" : isSaving ? "…" : "Save"}
-              </button>
+              {/* Save — only for super_admin */}
+              {canEdit && (
+                <button onClick={() => save(step)} disabled={isSaving || !isDirty} className="ec-save-btn" style={{
+                  width:70, background: isSaved ? "#118849" : isDirty ? "#118849" : "#d1d9e0",
+                  color: isDirty || isSaved ? "#fff" : "#9eafc2",
+                }}>
+                  {isSaved ? "Saved ✓" : isSaving ? "…" : "Save"}
+                </button>
+              )}
             </div>
           );
         })
