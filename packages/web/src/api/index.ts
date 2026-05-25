@@ -769,7 +769,7 @@ app.delete("/media/:id", async (c) => {
 
 // ── Campaign Steps ────────────────────────────────────────────────────
 app.get("/campaign-steps", async (c) => {
-  const err = requireRole(c, ["super_admin"]);
+  const err = requireAuth(c);
   if (err) return err;
   const steps = await db().select().from(schema.emailCampaignStep)
     .orderBy(schema.emailCampaignStep.stepNumber);
