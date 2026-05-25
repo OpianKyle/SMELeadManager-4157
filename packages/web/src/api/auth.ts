@@ -20,22 +20,28 @@ export const createAuth = (baseURL: string) =>
       sendResetPassword: async ({ user, url }) => {
         await sendEmail({
           to: user.email,
-          subject: "Reset your Masakhe Group password",
+          subject: "Set your Masakhe Group password",
           html: `
             <div style="font-family:'Open Sans',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;">
-              <h2 style="color:#0f326b;margin:0 0 16px;">Reset your password</h2>
+              <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+                <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Masakhe Group</p>
+              </div>
+              <h2 style="color:#0f326b;margin:0 0 16px;">Set your password</h2>
               <p style="color:#192943;font-size:14px;line-height:1.6;margin:0 0 24px;">
                 Hi ${user.name || user.email},<br><br>
-                We received a request to reset your password. Click the button below to set a new one.
+                Click the button below to set your password and access your account.
                 This link expires in 1 hour.
               </p>
               <a href="${url}" style="
                 display:inline-block;background:#118849;color:#ffffff;
                 font-size:14px;font-weight:700;text-decoration:none;
                 padding:13px 28px;border-radius:3px;
-              ">Reset Password →</a>
+              ">Set Password →</a>
               <p style="color:#5e708d;font-size:12px;margin:24px 0 0;line-height:1.5;">
-                If you didn't request this, you can safely ignore this email.
+                If you were not expecting this email, you can safely ignore it.
+              </p>
+              <p style="color:#9eafc2;font-size:11px;margin:16px 0 0;">
+                © ${new Date().getFullYear()} Masakhe Group (Pty) Ltd
               </p>
             </div>
           `,

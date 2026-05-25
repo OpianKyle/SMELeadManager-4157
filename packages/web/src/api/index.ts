@@ -222,20 +222,30 @@ app.post("/users", async (c) => {
   const callerIsAdmin = currentUser.role === "admin";
   const callerIsSuperAdmin = currentUser.role === "super_admin";
   if (!callerIsAdmin && !callerIsSuperAdmin) return c.json({ error: "Forbidden" }, 403);
-  const { name, email, password, role, phone, department, whatsappNumber } = await c.req.json();
-  if (!name || !email || !password) return c.json({ error: "name, email, password required" }, 400);
-  const assignedRole = callerIsAdmin ? "agent" : (role ?? "viewer");
+  const { name, email, role, phone, department, whatsappNumber } = await c.req.json();
+  if (!name || !email) return c.json({ error: "name and email required" }, 400);
+  const assignedRole = callerIsAdmin ? "agent" : (role ?? "admin");
   const managerId = callerIsAdmin ? currentUser.id : null;
   const baseURL = new URL(c.req.url).origin;
   const auth = createAuth(baseURL);
+  // Generate a secure random temporary password — user will set their own via invite email
+  const tempPassword = crypto.randomUUID() + "-" + crypto.randomUUID() + "-Tmp!";
   try {
-    const result = await auth.api.signUpEmail({ body: { name, email, password } });
+    const result = await auth.api.signUpEmail({ body: { name, email, password: tempPassword } });
     if (result?.user?.id) {
       await db().update(schema.user)
         .set({ role: assignedRole as any, phone, department, whatsappNumber, ...(managerId ? { managerId } : {}) })
         .where(eq(schema.user.id, result.user.id));
-    }
-    if (result?.user?.id) {
+      // Send invite/password-creation email via the auth forgot-password endpoint
+      try {
+        await fetch(`${baseURL}/api/auth/forget-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, redirectTo: `${baseURL}/reset-password` }),
+        });
+      } catch (emailErr: any) {
+        console.error("[invite] Failed to send invite email:", emailErr?.message);
+      }
       logActivity({ user: currentUser, action: "user_created", entity: "user", entityId: result.user.id, details: { name, email, role: assignedRole } });
     }
     return c.json({ success: true, userId: result?.user?.id }, 200);
@@ -292,9 +302,17 @@ app.get("/leads", async (c) => {
   const userMap = new Map(allUsers.map(au => [au.id, au.name]));
 
   let leads;
-  if (u.role === "agent" || u.role === "admin") {
+  if (u.role === "agent") {
     leads = await db().select().from(schema.lead)
       .where(eq(schema.lead.createdBy, u.id))
+      .orderBy(desc(schema.lead.createdAt));
+  } else if (u.role === "admin") {
+    // Distributor sees their own leads + all their agents' leads
+    const agentRows = await db().select({ id: schema.user.id }).from(schema.user)
+      .where(eq(schema.user.managerId, u.id));
+    const scopeIds = [u.id, ...agentRows.map(a => a.id)];
+    leads = await db().select().from(schema.lead)
+      .where(inArray(schema.lead.createdBy, scopeIds))
       .orderBy(desc(schema.lead.createdAt));
   } else {
     leads = await db().select().from(schema.lead).orderBy(desc(schema.lead.createdAt));
@@ -515,7 +533,23 @@ app.get("/email/preview/:stage", async (c) => {
 app.get("/email/logs", async (c) => {
   const err = requireAuth(c);
   if (err) return err;
-  const logs = await db().select().from(schema.emailLog).orderBy(desc(schema.emailLog.sentAt)).limit(100);
+  const u = c.get("user")!;
+  if (u.role === "super_admin") {
+    const logs = await db().select().from(schema.emailLog).orderBy(desc(schema.emailLog.sentAt)).limit(100);
+    return c.json({ logs }, 200);
+  }
+  // Scope to leads owned by the user and their team
+  let scopeUserIds = [u.id];
+  if (u.role === "admin") {
+    const agents = await db().select({ id: schema.user.id }).from(schema.user).where(eq(schema.user.managerId, u.id));
+    scopeUserIds = [u.id, ...agents.map(a => a.id)];
+  }
+  const scopedLeads = await db().select({ id: schema.lead.id }).from(schema.lead)
+    .where(inArray(schema.lead.createdBy, scopeUserIds));
+  if (scopedLeads.length === 0) return c.json({ logs: [] }, 200);
+  const logs = await db().select().from(schema.emailLog)
+    .where(inArray(schema.emailLog.leadId, scopedLeads.map(l => l.id)))
+    .orderBy(desc(schema.emailLog.sentAt)).limit(100);
   return c.json({ logs }, 200);
 });
 
@@ -875,9 +909,30 @@ app.delete("/leads/:id/notes/:noteId", async (c) => {
 app.get("/stats", async (c) => {
   const err = requireAuth(c);
   if (err) return err;
-  const leads = await db().select().from(schema.lead);
-  const logs = await db().select().from(schema.emailLog);
-  const users = await db().select().from(schema.user);
+  const u = c.get("user")!;
+
+  // Determine which leads are in scope for this user's role
+  let leads;
+  if (u.role === "super_admin") {
+    leads = await db().select().from(schema.lead);
+  } else if (u.role === "admin") {
+    const agentRows = await db().select({ id: schema.user.id }).from(schema.user)
+      .where(eq(schema.user.managerId, u.id));
+    const scopeIds = [u.id, ...agentRows.map(a => a.id)];
+    leads = await db().select().from(schema.lead)
+      .where(inArray(schema.lead.createdBy, scopeIds));
+  } else {
+    leads = await db().select().from(schema.lead)
+      .where(eq(schema.lead.createdBy, u.id));
+  }
+
+  const leadIds = leads.map(l => l.id);
+  const logs = leadIds.length > 0
+    ? await db().select().from(schema.emailLog).where(inArray(schema.emailLog.leadId, leadIds))
+    : [];
+  const users = u.role === "super_admin"
+    ? await db().select().from(schema.user)
+    : [];
 
   const stats = {
     totalLeads: leads.length,

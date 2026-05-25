@@ -18,7 +18,7 @@ export default function Users() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [form, setForm]       = useState({
-    name: "", email: "", password: "", role: "viewer", phone: "", department: "", whatsappNumber: "",
+    name: "", email: "", role: "admin", phone: "", department: "", whatsappNumber: "",
   });
 
   useEffect(() => {
@@ -43,9 +43,9 @@ export default function Users() {
     const data = await res.json();
     setLoading(false);
     if (data.error) { showToast("❌ " + data.error); return; }
-    showToast("✅ User created successfully");
+    showToast("✅ Account created — invite email sent");
     setShowAdd(false);
-    setForm({ name: "", email: "", password: "", role: "viewer", phone: "", department: "", whatsappNumber: "" });
+    setForm({ name: "", email: "", role: "admin", phone: "", department: "", whatsappNumber: "" });
     load();
   };
 
@@ -86,7 +86,7 @@ export default function Users() {
       <input
         type={type} value={(form as any)[key] ?? ""} placeholder={placeholder}
         onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
-        required={["name","email","password"].includes(key)}
+        required={["name","email"].includes(key)}
         style={{
           width: "100%", padding: "10px 12px", border: "1px solid #d1d9e0",
           borderRadius: 3, fontSize: 14, fontFamily: "'Open Sans',Arial,sans-serif",
@@ -469,50 +469,52 @@ export default function Users() {
             maxHeight: "90vh", overflowY: "auto", boxShadow: "0 8px 40px rgba(0,0,0,0.25)",
           }}>
             <div style={{ background: "#0f326b", padding: "20px 28px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#fff" }}>Create New User</h2>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#fff" }}>
+                {isAdmin ? "Create New Agent" : "Create New Distributor"}
+              </h2>
               <button onClick={() => setShowAdd(false)} style={{
                 background: "none", border: "none", color: "rgba(255,255,255,0.7)",
                 fontSize: 20, cursor: "pointer", lineHeight: 1,
               }}>×</button>
             </div>
             <div style={{ padding: "28px" }}>
+              {/* Invite notice */}
+              <div style={{
+                background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 3,
+                padding: "12px 16px", marginBottom: 20, display: "flex", gap: 10, alignItems: "flex-start",
+              }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>✉️</span>
+                <p style={{ margin: 0, fontSize: 13, color: "#15803d", lineHeight: 1.5 }}>
+                  An invite email will be sent automatically so {isAdmin ? "the agent" : "the distributor"} can set their own password and log in.
+                </p>
+              </div>
               <form onSubmit={createUser}>
-                {FIELD("Full Name *", "name", "text", "Sipho Dlamini")}
-                {FIELD("Email Address *", "email", "email", "sipho@masakhegroup.co.za")}
-                {FIELD("Password *", "password", "password", "Min. 8 characters")}
-                {FIELD("Phone Number", "phone", "tel", "+27 82 000 0000")}
-                {FIELD("WhatsApp Number", "whatsappNumber", "tel", "+27 82 000 0000")}
-                {FIELD("Department", "department", "text", "Sales, Support, Management…")}
+                {FIELD("Full Name *", "name", "text", isAdmin ? "Agent name" : "Distributor name")}
+                {FIELD("Email Address *", "email", "email", "email@example.com")}
 
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#192943", marginBottom: 8 }}>Role & Permissions *</label>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {(isAdmin ? ROLES.filter(r => r.value === "agent") : ROLES).map(r => (
-                      <label key={r.value} style={{
-                        display: "flex", alignItems: "flex-start", gap: 10,
-                        padding: "12px 14px", border: `2px solid ${form.role === r.value ? r.color : "#eef2f6"}`,
-                        borderRadius: 3, cursor: "pointer", background: form.role === r.value ? `${r.color}10` : "#fff",
-                        transition: "all 0.15s",
-                      }}>
-                        <input
-                          type="radio" name="role" value={r.value}
-                          checked={form.role === r.value}
-                          onChange={() => setForm(p => ({ ...p, role: r.value }))}
-                          style={{ marginTop: 2 }}
-                        />
-                        <div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {!isAdmin && (
+                  <div style={{ marginBottom: 20 }}>
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#192943", marginBottom: 8 }}>Role *</label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {ROLES.filter(r => r.value === "admin").map(r => (
+                        <label key={r.value} style={{
+                          display: "flex", alignItems: "flex-start", gap: 10,
+                          padding: "12px 14px", border: `2px solid ${r.color}`,
+                          borderRadius: 3, background: `${r.color}10`,
+                        }}>
+                          <input type="radio" name="role" value={r.value} checked readOnly style={{ marginTop: 2 }} />
+                          <div>
                             <span style={{
                               padding: "1px 8px", borderRadius: 8, fontSize: 11, fontWeight: 700,
                               background: r.color, color: "#fff", textTransform: "uppercase",
                             }}>{r.label}</span>
+                            <div style={{ fontSize: 12, color: "#5e708d", marginTop: 3 }}>{r.desc}</div>
                           </div>
-                          <div style={{ fontSize: 12, color: "#5e708d", marginTop: 3 }}>{r.desc}</div>
-                        </div>
-                      </label>
-                    ))}
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div style={{ display: "flex", gap: 10 }}>
                   <button type="submit" disabled={loading} style={{
@@ -521,7 +523,7 @@ export default function Users() {
                     fontFamily: "'Open Sans',Arial,sans-serif", cursor: loading ? "not-allowed" : "pointer",
                     opacity: loading ? 0.7 : 1,
                   }}>
-                    {loading ? "Creating..." : "Create User"}
+                    {loading ? "Creating..." : isAdmin ? "Create Agent" : "Create Distributor"}
                   </button>
                   <button type="button" onClick={() => setShowAdd(false)} style={{
                     padding: "12px 20px", background: "#eef2f6", color: "#192943",
