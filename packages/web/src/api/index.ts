@@ -238,12 +238,13 @@ app.post("/users", async (c) => {
         .where(eq(schema.user.id, result.user.id));
       // Generate a password reset token directly and send invite email ourselves
       try {
-        const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+        // Token must be 24 chars; identifier must be "reset-password:<token>"; value must be userId
+        const token = crypto.randomUUID().replace(/-/g, "").slice(0, 24);
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
         await db().insert(schema.verification).values({
           id: crypto.randomUUID(),
-          identifier: email,
-          value: token,
+          identifier: `reset-password:${token}`,
+          value: result.user.id,
           expiresAt,
         });
         const resetUrl = `${baseURL}/reset-password?token=${token}`;
