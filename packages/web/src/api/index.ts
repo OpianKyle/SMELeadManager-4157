@@ -236,12 +236,10 @@ app.post("/users", async (c) => {
       await db().update(schema.user)
         .set({ role: assignedRole as any, phone, department, whatsappNumber, ...(managerId ? { managerId } : {}) })
         .where(eq(schema.user.id, result.user.id));
-      // Send invite/password-creation email via the auth forgot-password endpoint
+      // Send invite/password-creation email via Better Auth's server-side API (no HTTP round-trip)
       try {
-        await fetch(`${baseURL}/api/auth/forget-password`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, redirectTo: `${baseURL}/reset-password` }),
+        await auth.api.forgetPassword({
+          body: { email, redirectTo: `${baseURL}/reset-password` },
         });
       } catch (emailErr: any) {
         console.error("[invite] Failed to send invite email:", emailErr?.message);
