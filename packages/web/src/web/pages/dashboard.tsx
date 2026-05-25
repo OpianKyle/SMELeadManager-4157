@@ -11,16 +11,31 @@ const STAGE_LABELS: Record<string, { label: string; color: string }> = {
   completed:       { label: "Completed",       color: "#059669" },
 };
 
+const PORTAL_BASE = "https://masakheportal.co.za/signup";
+
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
   const [logs, setLogs]   = useState<any[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
+  const [user, setUser]   = useState<any>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     api.get("/stats").then(r => r.json()).then(d => setStats(d.stats));
     api.get("/email/logs").then(r => r.json()).then(d => setLogs((d.logs ?? []).slice(0, 5)));
     api.get("/leads").then(r => r.json()).then(d => setLeads((d.leads ?? []).slice(0, 5)));
+    api.get("/me").then(r => r.json()).then(d => setUser(d.user));
   }, []);
+
+  const signupLink = user ? `${PORTAL_BASE}?ref=${user.id}` : null;
+
+  function copyLink() {
+    if (!signupLink) return;
+    navigator.clipboard.writeText(signupLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   return (
     <Layout>
@@ -112,6 +127,29 @@ export default function Dashboard() {
           })}
         </div>
       </div>
+
+      {/* Signup Link Card */}
+      {signupLink && (
+        <div style={{ background:"#fff", borderRadius:4, padding:"16px 20px", marginBottom:24,
+          boxShadow:"0 1px 4px rgba(0,0,0,0.07)", borderLeft:"4px solid #118849" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:10 }}>
+            <div style={{ minWidth:0 }}>
+              <div style={{ fontSize:13, fontWeight:700, color:"#192943", marginBottom:4 }}>Your Portal Signup Link</div>
+              <div style={{ fontSize:12, color:"#5e708d", wordBreak:"break-all" }}>{signupLink}</div>
+            </div>
+            <button onClick={copyLink} style={{
+              padding:"8px 18px", background: copied ? "#118849" : "#0f326b", color:"#fff",
+              border:"none", borderRadius:3, fontSize:12, fontWeight:700, cursor:"pointer",
+              fontFamily:"'Open Sans',Arial,sans-serif", flexShrink:0, transition:"background 0.2s",
+            }}>
+              {copied ? "Copied ✓" : "Copy Link"}
+            </button>
+          </div>
+          <div style={{ fontSize:11, color:"#9eafc2", marginTop:8 }}>
+            Share this link on masakheportal.co.za — signups will automatically appear in your leads.
+          </div>
+        </div>
+      )}
 
       <div className="bottom-grid">
         {/* Recent leads */}

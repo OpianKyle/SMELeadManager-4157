@@ -1036,6 +1036,71 @@ app.get("/leads/:id/whatsapp", async (c) => {
   return c.json({ logs });
 });
 
+// ── Portal Signup Webhook ─────────────────────────────────────────────
+// Called by masakheportal.co.za when a visitor signs up via an agent's link.
+// Payload: { name, email, phone?, business?, agentId, notes? }
+// Header:  x-webhook-secret: <WEBHOOK_SECRET>
+app.post("/webhooks/signup", async (c) => {
+  const secret = process.env.WEBHOOK_SECRET;
+  if (secret) {
+    const incoming = c.req.header("x-webhook-secret");
+    if (incoming !== secret) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+  }
+
+  let body: any;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: "Invalid JSON body" }, 400);
+  }
+
+  const { name, email, phone, business, agentId, notes } = body ?? {};
+
+  if (!name || !email) {
+    return c.json({ error: "name and email are required" }, 400);
+  }
+
+  // Resolve agent — agentId is optional; if provided it must match a real user
+  let resolvedAgentId: string | null = null;
+  if (agentId) {
+    const [agent] = await db()
+      .select({ id: schema.user.id })
+      .from(schema.user)
+      .where(eq(schema.user.id, agentId));
+    if (!agent) {
+      return c.json({ error: `Agent not found: ${agentId}` }, 404);
+    }
+    resolvedAgentId = agent.id;
+  }
+
+  const id = crypto.randomUUID();
+  await db().insert(schema.lead).values({
+    id,
+    name: String(name).trim(),
+    email: String(email).trim().toLowerCase(),
+    phone: phone ? String(phone).trim() : undefined,
+    business: business ? String(business).trim() : undefined,
+    source: "portal_signup",
+    notes: notes ? String(notes).trim() : undefined,
+    createdBy: resolvedAgentId ?? undefined,
+  });
+
+  await logActivity({
+    user: { id: resolvedAgentId, name: "Portal Webhook", role: "system" },
+    action: "lead_created",
+    entity: "lead",
+    entityId: id,
+    details: { name, email, source: "portal_signup", agentId: resolvedAgentId },
+  });
+
+  // Fire stage 1 automation immediately
+  maybeSendStage1(id);
+
+  return c.json({ success: true, leadId: id }, 201);
+});
+
 app.route("/google", googleRoutes);
 
 export default app;
