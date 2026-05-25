@@ -7,8 +7,6 @@ const NAV = [
   { path: "/dashboard", label: "Dashboard", icon: "⊞" },
   { path: "/leads", label: "Leads", icon: "👥" },
   { path: "/import", label: "Import Leads", icon: "📊" },
-  { path: "/workflow", label: "Workflow", icon: "⚡" },
-  { path: "/email-automation", label: "Email Automation", icon: "📧" },
   { path: "/users", label: "User Management", icon: "🔐", roles: ["super_admin", "admin"] },
   { path: "/activity-log", label: "Activity Log", icon: "📋", roles: ["super_admin", "admin"] },
   { path: "/media", label: "Media Library", icon: "🖼️", roles: ["super_admin", "admin", "agent"] },
