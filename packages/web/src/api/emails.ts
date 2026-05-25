@@ -18,7 +18,7 @@ export function emailWrapper(content: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masakhe Group</title>
+  <title>Masakhe Lead Manager</title>
 </head>
 <body style="${baseStyle}">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; padding: 32px 0;">
@@ -32,7 +32,7 @@ export function emailWrapper(content: string): string {
               <tr>
                 <td>
                   <span style="font-family:'Open Sans',Arial,sans-serif; font-size:22px; font-weight:900; color:#ffffff; letter-spacing:-0.5px;">
-                    M <span style="font-weight:400;">Masakhe</span> <span style="color:#118849; font-weight:700;">Group</span>
+                    M <span style="font-weight:400;">Masakhe</span> <span style="color:#118849; font-weight:700;">Lead Manager</span>
                   </span>
                 </td>
                 <td align="right">
