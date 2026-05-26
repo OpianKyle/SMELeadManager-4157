@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
 import { api } from "@/lib/api";
+import { EmailEditor } from "@/components/email-editor";
 
 export default function EmailCampaign() {
   const [steps, setSteps] = useState<any[]>([]);
@@ -8,6 +9,7 @@ export default function EmailCampaign() {
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
   const [modal, setModal] = useState<{ step: any; tab: "preview" | "edit" } | null>(null);
+  const [htmlMode, setHtmlMode] = useState(false);
   const [edits, setEdits] = useState<Record<string, { delayDays: string; subject: string; enabled: boolean; bodyHtml: string }>>({});
   const [currentUser, setCurrentUser] = useState<any>(null);
 
@@ -285,15 +287,31 @@ export default function EmailCampaign() {
             </div>
 
             {/* Tabs */}
-            <div className="ec-modal-tabs">
-              <button className={`ec-tab${modal.tab === "preview" ? " active" : ""}`}
-                onClick={() => setModal(m => m ? { ...m, tab: "preview" } : m)}>
-                Preview
-              </button>
-              {canEdit && (
-                <button className={`ec-tab${modal.tab === "edit" ? " active" : ""}`}
-                  onClick={() => setModal(m => m ? { ...m, tab: "edit" } : m)}>
-                  Edit HTML Body
+            <div className="ec-modal-tabs" style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <div style={{ display:"flex" }}>
+                <button className={`ec-tab${modal.tab === "preview" ? " active" : ""}`}
+                  onClick={() => setModal(m => m ? { ...m, tab: "preview" } : m)}>
+                  Preview
+                </button>
+                {canEdit && (
+                  <button className={`ec-tab${modal.tab === "edit" ? " active" : ""}`}
+                    onClick={() => setModal(m => m ? { ...m, tab: "edit" } : m)}>
+                    Edit
+                  </button>
+                )}
+              </div>
+              {canEdit && modal.tab === "edit" && (
+                <button
+                  onClick={() => setHtmlMode(h => !h)}
+                  style={{
+                    marginRight:16, padding:"4px 10px", fontSize:11, fontWeight:700,
+                    background: htmlMode ? "#192943" : "#eef2f6",
+                    color: htmlMode ? "#fff" : "#5e708d",
+                    border:"1px solid #d1d9e0", borderRadius:3, cursor:"pointer",
+                    fontFamily:"'Open Sans',Arial,sans-serif",
+                  }}
+                >
+                  {htmlMode ? "◀ Visual" : "HTML ▶"}
                 </button>
               )}
             </div>
@@ -303,7 +321,7 @@ export default function EmailCampaign() {
               {modal.tab === "preview" ? (
                 <div style={{ padding:20 }}
                   dangerouslySetInnerHTML={{ __html: modalEdit.bodyHtml || modalStep.bodyHtml }} />
-              ) : (
+              ) : htmlMode ? (
                 <textarea
                   className="ec-body-textarea"
                   value={modalEdit.bodyHtml}
@@ -314,6 +332,16 @@ export default function EmailCampaign() {
                   spellCheck={false}
                   placeholder="Enter HTML body…"
                 />
+              ) : (
+                <div style={{ padding:16 }}>
+                  <EmailEditor
+                    value={modalEdit.bodyHtml}
+                    onChange={html => setEdits(d => ({
+                      ...d,
+                      [modalStep.id]: { ...d[modalStep.id], bodyHtml: html },
+                    }))}
+                  />
+                </div>
               )}
             </div>
 
