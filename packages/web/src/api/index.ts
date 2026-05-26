@@ -366,16 +366,35 @@ async function maybeSendStage1(leadId: string) {
     if (!cfg || (!cfg.stage1Auto && !cfg.autoMode)) return;
     const [lead] = await db().select().from(schema.lead).where(eq(schema.lead.id, leadId));
     if (!lead || lead.optedOut || lead.lastEmailAt) return;
-    const email = stage1Email(lead.name, lead.business ?? "");
-    await sendEmail({ to: lead.email, subject: email.subject, html: email.html });
+
+    // Use the first enabled campaign step instead of the hardcoded stage1 email
+    const steps = await db()
+      .select()
+      .from(schema.emailCampaignStep)
+      .where(eq(schema.emailCampaignStep.enabled, true))
+      .orderBy(schema.emailCampaignStep.stepNumber);
+    const firstStep = steps[0];
+    if (!firstStep) {
+      console.warn(`[automation] No enabled campaign steps found — skipping stage 1 for ${lead.email}`);
+      return;
+    }
+
+    const bodyHtml = firstStep.bodyHtml
+      .replace(/\{\{name\}\}/g, lead.name)
+      .replace(/\{\{business\}\}/g, lead.business ?? "your business");
+    const subject = firstStep.subject
+      .replace(/\{\{name\}\}/g, lead.name)
+      .replace(/\{\{business\}\}/g, lead.business ?? "your business");
+
+    await sendEmail({ to: lead.email, subject, html: emailWrapper(bodyHtml) });
     await db().insert(schema.emailLog).values({
       id: crypto.randomUUID(), leadId: lead.id, stage: "stage1",
-      subject: email.subject, sentBy: "auto", status: "sent",
+      subject, sentBy: "auto", status: "sent",
     });
     await db().update(schema.lead)
       .set({ lastEmailAt: new Date(), updatedAt: new Date() })
       .where(eq(schema.lead.id, leadId));
-    console.log(`[automation] Stage 1 sent immediately to ${lead.email}`);
+    console.log(`[automation] Campaign step 1 sent immediately to ${lead.email}`);
   } catch (e: any) {
     console.error(`[automation] Immediate stage 1 failed for lead ${leadId}:`, e.message);
   }
