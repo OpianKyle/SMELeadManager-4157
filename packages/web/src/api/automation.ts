@@ -243,9 +243,10 @@ export async function runAutomationTick() {
         );
 
       for (const lead of followUpCandidates) {
-        if ((lead.followUpCount ?? 0) >= 3) continue;
+        const currentCount = Number(lead.followUpCount ?? 0);
+        if (currentCount >= 3) continue;
 
-        const nextFollowUp = ((lead.followUpCount ?? 0) + 1) as 1 | 2 | 3;
+        const nextFollowUp = (currentCount + 1) as 1 | 2 | 3;
 
         const logs = await database.select().from(schema.emailLog)
           .where(eq(schema.emailLog.leadId, lead.id));

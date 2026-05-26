@@ -259,7 +259,7 @@ export function stage3Email(name: string, slots: string[]) {
 
 // ── Stage 4: Follow-up (1/2/3) ───────────────────────────────────────
 export function stage4Email(name: string, followUpNum: 1 | 2 | 3) {
-  const variants = {
+  const variants: Record<number, { subject: string; headline: string; body: string }> = {
     1: {
       subject: `Hi ${name} — just checking in 👋`,
       headline: "Still Interested in Growing Your Business?",
@@ -277,7 +277,8 @@ export function stage4Email(name: string, followUpNum: 1 | 2 | 3) {
     },
   };
 
-  const v = variants[followUpNum];
+  const v = variants[Number(followUpNum)];
+  if (!v) throw new Error(`Invalid followUpNum: ${followUpNum}`);
 
   return {
     subject: v.subject,
