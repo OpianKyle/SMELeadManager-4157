@@ -11,7 +11,7 @@ const STAGE_LABELS: Record<string, { label: string; color: string }> = {
   completed:       { label: "Completed",       color: "#059669" },
 };
 
-const PORTAL_BASE = "https://masakheportal.co.za/signup";
+const PORTAL_BASE = "https://masakheportal.co.za/register";
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
