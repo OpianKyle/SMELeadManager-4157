@@ -379,17 +379,23 @@ export async function runAutomationTick() {
         if (now < sendAfter) continue;
 
         try {
-          const html = emailWrapper(nextStep.bodyHtml);
+          const bodyHtml = nextStep.bodyHtml
+            .replace(/\{\{name\}\}/g, lead.name)
+            .replace(/\{\{business\}\}/g, lead.business ?? "your business");
+          const subject = nextStep.subject
+            .replace(/\{\{name\}\}/g, lead.name)
+            .replace(/\{\{business\}\}/g, lead.business ?? "your business");
+          const html = emailWrapper(bodyHtml);
           // Mark before send to prevent race conditions
           await database.insert(schema.emailLog).values({
             id: crypto.randomUUID(),
             leadId: lead.id,
             stage: `campaign_${nextStep.stepNumber}`,
-            subject: nextStep.subject,
+            subject,
             sentBy: "auto",
             status: "sent",
           });
-          await sendEmail({ to: lead.email, subject: nextStep.subject, html });
+          await sendEmail({ to: lead.email, subject, html });
           console.log(`[campaign] Email ${nextStep.stepNumber} sent to ${lead.email}`);
         } catch (e: any) {
           console.error(`[campaign] Email ${nextStep.stepNumber} failed for ${lead.email}:`, e.message);

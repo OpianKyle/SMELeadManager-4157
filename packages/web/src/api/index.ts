@@ -388,7 +388,7 @@ async function maybeSendStage1(leadId: string) {
 
     await sendEmail({ to: lead.email, subject, html: emailWrapper(bodyHtml) });
     await db().insert(schema.emailLog).values({
-      id: crypto.randomUUID(), leadId: lead.id, stage: "stage1",
+      id: crypto.randomUUID(), leadId: lead.id, stage: `campaign_${firstStep.stepNumber}`,
       subject, sentBy: "auto", status: "sent",
     });
     await db().update(schema.lead)
