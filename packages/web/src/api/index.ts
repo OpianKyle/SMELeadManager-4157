@@ -240,7 +240,7 @@ app.post("/users", async (c) => {
       try {
         // Token must be 24 chars; identifier must be "reset-password:<token>"; value must be userId
         const token = crypto.randomUUID().replace(/-/g, "").slice(0, 24);
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
         await db().insert(schema.verification).values({
           id: crypto.randomUUID(),
           identifier: `reset-password:${token}`,
