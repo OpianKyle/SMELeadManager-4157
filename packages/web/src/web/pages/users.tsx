@@ -77,6 +77,14 @@ export default function Users() {
     load();
   };
 
+  const sendReset = async (u: any) => {
+    if (!confirm(`Send a password reset email to ${u.name} (${u.email})?`)) return;
+    const res = await api.post(`/users/${u.id}/send-reset`, {});
+    const data = await res.json();
+    if (data.error) { showToast("❌ " + data.error); return; }
+    showToast(`✅ Password reset email sent to ${u.email}`);
+  };
+
   const isSuperAdmin = currentUser?.role === "super_admin";
   const isAdmin = currentUser?.role === "admin";
 
@@ -328,6 +336,11 @@ export default function Users() {
                       )}
                       {isSuperAdmin && !isMe && (
                         <>
+                          <button onClick={() => sendReset(u)} style={{
+                            padding: "5px 10px", background: "#eff6ff", border: "1px solid #bfdbfe",
+                            color: "#1d4ed8", borderRadius: 3, fontSize: 12, cursor: "pointer",
+                            fontFamily: "'Open Sans',Arial,sans-serif",
+                          }}>Reset Password</button>
                           <button onClick={() => toggleActive(u)} style={{
                             padding: "5px 10px",
                             background: u.isActive ? "#fffbeb" : "#f0fdf4",
@@ -437,6 +450,11 @@ export default function Users() {
                 )}
                 {isSuperAdmin && !isMe && (
                   <>
+                    <button onClick={() => sendReset(u)} style={{
+                      padding: "7px 14px", background: "#eff6ff", border: "1px solid #bfdbfe",
+                      color: "#1d4ed8", borderRadius: 3, fontSize: 13, cursor: "pointer",
+                      fontFamily: "'Open Sans',Arial,sans-serif",
+                    }}>Reset Password</button>
                     <button onClick={() => toggleActive(u)} style={{
                       padding: "7px 14px",
                       background: u.isActive ? "#fffbeb" : "#f0fdf4",
