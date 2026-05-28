@@ -248,6 +248,8 @@ app.post("/users", async (c) => {
           expiresAt,
         });
         const resetUrl = `${baseURL}/reset-password?token=${token}`;
+        const referralUrl = `https://masakheportal.co.za/register?ref=${result.user.id}`;
+        const showReferral = assignedRole === "agent" || assignedRole === "admin";
         await sendEmail({
           to: email,
           subject: "Set your Masakhe Lead Manager password",
@@ -261,13 +263,24 @@ app.post("/users", async (c) => {
                 Hi ${name},<br><br>
                 An account has been created for you on Masakhe Lead Manager.
                 Click the button below to set your password and log in.
-                This link expires in 1 hour.
+                This link expires in 24 hours.
               </p>
               <a href="${resetUrl}" style="
                 display:inline-block;background:#118849;color:#ffffff;
                 font-size:14px;font-weight:700;text-decoration:none;
                 padding:13px 28px;border-radius:3px;
               ">Set Password →</a>
+              ${showReferral ? `
+              <div style="margin-top:32px;padding:20px;background:#f0f7ff;border-radius:4px;border-left:4px solid #0f326b;">
+                <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;font-weight:700;color:#0f326b;margin:0 0 8px;">Your Referral Link</p>
+                <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#192943;margin:0 0 12px;line-height:1.5;">
+                  Share this link with prospects to track sign-ups directly to your account:
+                </p>
+                <a href="${referralUrl}" style="
+                  display:block;word-break:break-all;color:#118849;font-size:13px;
+                  font-weight:700;text-decoration:none;
+                ">${referralUrl}</a>
+              </div>` : ""}
               <p style="color:#5e708d;font-size:12px;margin:24px 0 0;line-height:1.5;">
                 If you were not expecting this email, you can safely ignore it.
               </p>
@@ -343,6 +356,8 @@ app.post("/users/:id/send-reset", async (c) => {
       expiresAt,
     });
     const resetUrl = `${baseURL}/reset-password?token=${token}`;
+    const referralUrl = `https://masakheportal.co.za/register?ref=${target.id}`;
+    const showReferral = target.role === "agent" || target.role === "admin";
     await sendEmail({
       to: target.email,
       subject: "Reset your Masakhe Lead Manager password",
@@ -363,6 +378,17 @@ app.post("/users/:id/send-reset", async (c) => {
             font-size:14px;font-weight:700;text-decoration:none;
             padding:13px 28px;border-radius:3px;
           ">Reset Password →</a>
+          ${showReferral ? `
+          <div style="margin-top:32px;padding:20px;background:#f0f7ff;border-radius:4px;border-left:4px solid #0f326b;">
+            <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;font-weight:700;color:#0f326b;margin:0 0 8px;">Your Referral Link</p>
+            <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#192943;margin:0 0 12px;line-height:1.5;">
+              Share this link with prospects to track sign-ups directly to your account:
+            </p>
+            <a href="${referralUrl}" style="
+              display:block;word-break:break-all;color:#118849;font-size:13px;
+              font-weight:700;text-decoration:none;
+            ">${referralUrl}</a>
+          </div>` : ""}
           <p style="color:#5e708d;font-size:12px;margin:24px 0 0;line-height:1.5;">
             If you were not expecting this email, you can safely ignore it.
           </p>
