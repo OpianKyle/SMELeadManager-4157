@@ -37,7 +37,17 @@ export default function ResetPassword() {
     try {
       const res = await authClient.resetPassword({ newPassword: password, token });
       if (res.error) {
-        setError(res.error.message ?? "Failed to reset password");
+        const msg = res.error.message ?? "";
+        const isUsedOrExpired =
+          msg.toLowerCase().includes("expired") ||
+          msg.toLowerCase().includes("invalid") ||
+          msg.toLowerCase().includes("used") ||
+          msg.toLowerCase().includes("not found");
+        if (isUsedOrExpired) {
+          setError("__USED__");
+        } else {
+          setError(msg || "Failed to reset password");
+        }
       } else {
         setDone(true);
       }
@@ -166,12 +176,31 @@ export default function ResetPassword() {
                 </div>
               </div>
 
-              {error && (
+              {error === "__USED__" ? (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{
+                    padding: "14px 16px", background: "#fff7ed", border: "1px solid #fed7aa",
+                    borderRadius: 3, fontSize: 13, color: "#9a3412", marginBottom: 10, lineHeight: 1.6,
+                  }}>
+                    <strong>This link has already been used or has expired.</strong><br />
+                    Password set links are single-use. If you already set your password, sign in below. Otherwise, ask your administrator to send you a new link.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setLocation("/sign-in")}
+                    style={{
+                      width: "100%", padding: "11px", background: "#0f326b", color: "#fff",
+                      border: "none", borderRadius: 3, fontSize: 14, fontWeight: 700,
+                      fontFamily: "'Open Sans', Arial, sans-serif", cursor: "pointer",
+                    }}
+                  >Go to Sign In →</button>
+                </div>
+              ) : error ? (
                 <div style={{
                   padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca",
                   borderRadius: 3, fontSize: 13, color: "#dc2626", marginBottom: 16,
                 }}>{error}</div>
-              )}
+              ) : null}
 
               <button type="submit" disabled={loading} style={{
                 width: "100%", padding: "13px", background: "#118849", color: "#fff",

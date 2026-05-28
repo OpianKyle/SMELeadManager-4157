@@ -270,11 +270,14 @@ app.post("/users", async (c) => {
                 font-size:14px;font-weight:700;text-decoration:none;
                 padding:13px 28px;border-radius:3px;
               ">Set Password →</a>
+              <p style="color:#9eafc2;font-size:11px;margin:10px 0 0;line-height:1.5;">
+                ⚠️ This button can only be used once. Once you've set your password, use the sign-in page going forward.
+              </p>
               ${showReferral ? `
-              <div style="margin-top:32px;padding:20px;background:#f0f7ff;border-radius:4px;border-left:4px solid #0f326b;">
+              <div style="margin-top:28px;padding:20px;background:#f0f7ff;border-radius:4px;border-left:4px solid #0f326b;">
                 <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;font-weight:700;color:#0f326b;margin:0 0 8px;">Your Referral Link</p>
                 <p style="font-family:'Open Sans',Arial,sans-serif;font-size:13px;color:#192943;margin:0 0 12px;line-height:1.5;">
-                  Share this link with prospects to track sign-ups directly to your account:
+                  Share this link with prospects to track sign-ups directly to your account. This link is permanent and can be shared as many times as you like:
                 </p>
                 <a href="${referralUrl}" style="
                   display:block;word-break:break-all;color:#118849;font-size:13px;
