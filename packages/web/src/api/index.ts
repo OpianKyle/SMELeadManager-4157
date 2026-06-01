@@ -418,6 +418,10 @@ app.get("/subscriptions", async (c) => {
       headers: { "x-webhook-secret": secret ?? "" },
     });
     if (!res.ok) return c.json({ error: `Portal returned ${res.status}` }, 502);
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      return c.json({ error: "Subscription data is temporarily unavailable. The portal endpoint did not return valid data." }, 502);
+    }
     const data = await res.json();
     return c.json(data);
   } catch (e: any) {
