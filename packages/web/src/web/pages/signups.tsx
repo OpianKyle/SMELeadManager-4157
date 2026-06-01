@@ -53,8 +53,11 @@ export default function Signups() {
   const isAdmin      = me?.role === "admin";
   const isAgent      = me?.role === "agent";
 
+  // Only show leads that came in through a referral/portal signup link
+  const referralLeads = leads.filter(l => l.source === "portal_signup");
+
   // Apply filters
-  const filtered = leads.filter(l => {
+  const filtered = referralLeads.filter(l => {
     if (filterAgent !== "all" && l.createdBy !== filterAgent) return false;
     if (filterStage !== "all" && l.stage !== filterStage) return false;
     if (search) {
@@ -68,18 +71,18 @@ export default function Signups() {
     return true;
   });
 
-  // Summary stats (on full unfiltered list)
+  // Summary stats (on referral leads only, unfiltered)
   const thisMonth = startOfMonth();
-  const totalLeads     = leads.length;
-  const completed      = leads.filter(l => l.stage === "completed").length;
-  const booked         = leads.filter(l => l.stage === "booked").length;
-  const thisMonthCount = leads.filter(l => new Date(l.createdAt) >= thisMonth).length;
+  const totalLeads     = referralLeads.length;
+  const completed      = referralLeads.filter(l => l.stage === "completed").length;
+  const booked         = referralLeads.filter(l => l.stage === "booked").length;
+  const thisMonthCount = referralLeads.filter(l => new Date(l.createdAt) >= thisMonth).length;
   const conversionRate = totalLeads > 0 ? ((completed / totalLeads) * 100).toFixed(1) : "0.0";
 
   // Per-agent breakdown (admins and super_admin)
   const agentMap = new Map<string, { name: string; total: number; completed: number; booked: number }>();
   if (!isAgent) {
-    for (const l of leads) {
+    for (const l of referralLeads) {
       if (!l.createdBy) continue;
       const entry = agentMap.get(l.createdBy) ?? {
         name: l.createdByName ?? l.createdBy,
