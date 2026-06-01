@@ -102,6 +102,7 @@ function LeadDrawer({
   const [waModal, setWaModal]     = useState(false);
   const [waMsg, setWaMsg]         = useState("");
   const [waSending, setWaSending] = useState(false);
+  const [subscription, setSubscription] = useState<any>(null);
 
   const canEdit      = user && ["super_admin", "admin", "agent"].includes(user.role);
   const canDelete    = user && ["super_admin", "admin"].includes(user.role);
@@ -110,6 +111,18 @@ function LeadDrawer({
   useEffect(() => {
     loadNotes();
     loadWaLogs();
+    setSubscription(null);
+    if (lead.email) {
+      api.get("/subscriptions")
+        .then(r => r.json())
+        .then(d => {
+          const match = (d.subscriptions ?? []).find(
+            (s: any) => s.user?.email?.toLowerCase() === lead.email.toLowerCase()
+          );
+          setSubscription(match ?? null);
+        })
+        .catch(() => {});
+    }
   }, [lead.id]);
 
   const loadNotes = () =>
@@ -342,6 +355,65 @@ function LeadDrawer({
               ) : "—"} />
             </div>
           </Section>
+
+          {/* Portal subscription status */}
+          {subscription && (() => {
+            const statusColors: Record<string, { bg: string; color: string; border: string }> = {
+              ACTIVE:    { bg: "#f0fdf4", color: "#15803d", border: "#86efac" },
+              TRIAL:     { bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe" },
+              EXPIRED:   { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
+              CANCELLED: { bg: "#f9fafb", color: "#6b7280", border: "#d1d5db" },
+            };
+            const sc = statusColors[subscription.status] ?? statusColors.EXPIRED;
+            const daysLeft = subscription.status === "TRIAL" && subscription.trialEndAt
+              ? Math.ceil((new Date(subscription.trialEndAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+              : null;
+            return (
+              <Section title="Portal Subscription">
+                <div style={{
+                  background: sc.bg, border: `1px solid ${sc.border}`,
+                  borderRadius: 6, padding: "12px 16px", display: "flex", flexDirection: "column", gap: 8,
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#192943" }}>
+                      {subscription.plan?.name ?? "Unknown Plan"}
+                    </div>
+                    <span style={{
+                      padding: "3px 10px", borderRadius: 10, fontSize: 11, fontWeight: 700,
+                      background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`,
+                      textTransform: "uppercase", letterSpacing: "0.5px",
+                    }}>{subscription.status}</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px", fontSize: 12 }}>
+                    <div>
+                      <div style={{ color: "#9eafc2", fontWeight: 600, marginBottom: 2 }}>Price</div>
+                      <div style={{ color: "#118849", fontWeight: 700 }}>{subscription.plan?.priceFormatted ?? "—"}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: "#9eafc2", fontWeight: 600, marginBottom: 2 }}>Subscribed</div>
+                      <div style={{ color: "#192943" }}>{fmtShort(subscription.subscribedAt)}</div>
+                    </div>
+                    {subscription.status === "TRIAL" && (
+                      <>
+                        <div>
+                          <div style={{ color: "#9eafc2", fontWeight: 600, marginBottom: 2 }}>Trial Ends</div>
+                          <div style={{ color: "#192943" }}>{fmtShort(subscription.trialEndAt)}</div>
+                        </div>
+                        {daysLeft !== null && (
+                          <div>
+                            <div style={{ color: "#9eafc2", fontWeight: 600, marginBottom: 2 }}>Days Left</div>
+                            <div style={{ fontWeight: 700, color: daysLeft <= 3 ? "#dc2626" : daysLeft <= 7 ? "#d97706" : "#192943" }}>
+                              {daysLeft > 0 ? `${daysLeft} days` : "Expired"}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Section>
+            );
+          })()}
 
           {/* Timestamped Notes */}
           <Section title={`Notes (${notes.length})`}>

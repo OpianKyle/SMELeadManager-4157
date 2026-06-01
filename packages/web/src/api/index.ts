@@ -408,6 +408,23 @@ app.post("/users/:id/send-reset", async (c) => {
   }
 });
 
+// ── Subscriptions (proxy to masakheportal.co.za) ─────────────────────
+app.get("/subscriptions", async (c) => {
+  const err = requireAuth(c);
+  if (err) return err;
+  const secret = process.env.WEBHOOK_SECRET;
+  try {
+    const res = await fetch("https://masakheportal.co.za/api/external/subscriptions", {
+      headers: { "x-webhook-secret": secret ?? "" },
+    });
+    if (!res.ok) return c.json({ error: `Portal returned ${res.status}` }, 502);
+    const data = await res.json();
+    return c.json(data);
+  } catch (e: any) {
+    return c.json({ error: e?.message ?? "Failed to fetch subscriptions" }, 502);
+  }
+});
+
 // ── Leads ────────────────────────────────────────────────────────────
 app.get("/leads", async (c) => {
   const err = requireAuth(c);
