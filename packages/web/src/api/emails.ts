@@ -126,6 +126,259 @@ export function emailWrapper(content: string): string {
 </html>`;
 }
 
+// ── 1. Connection Attempt #1 — no answer, no voicemail ───────────────
+export function attempt1Email(name: string) {
+  return {
+    subject: `We tried reaching you – Masakhe Group`,
+    html: emailWrapper(`
+      <div style="background:#0f326b; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">We Tried to Reach You</p>
+      </div>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        This is the Masakhe Team. We just tried calling you to follow up on your enquiry and help get you started.
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        No need to call back right now. You can simply reply to this email with the best number and time to reach you, or reach us on WhatsApp below — we're happy to help.
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#5e708d; margin:0;">
+        Best regards,<br><strong>Masakhe Team</strong>
+      </p>
+    `),
+  };
+}
+
+// ── 2. Connection Attempt #2 — still no answer (24h later) ───────────
+export function attempt2Email(name: string) {
+  return {
+    subject: `Still trying to reach you – Masakhe Group`,
+    html: emailWrapper(`
+      <div style="background:#0f326b; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">We Called Again — Let's Make This Easy</p>
+      </div>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        We tried calling again today. Since we haven't connected yet, we want to make this as easy as possible for you.
+      </p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; border-radius:3px; padding:16px 20px; margin:0 0 20px 0;">
+        <tr>
+          <td style="padding:6px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+            <span style="color:#118849; font-weight:700; margin-right:8px;">→</span>
+            Reply with <strong>"Call me [Day] at [Time]"</strong> and we'll adjust to your schedule.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:6px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+            <span style="color:#118849; font-weight:700; margin-right:8px;">→</span>
+            Or simply reach out on WhatsApp below — we respond fast.
+          </td>
+        </tr>
+      </table>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#5e708d; margin:0;">
+        We'll try once more tomorrow. If we miss you again, we'll follow up by email.
+      </p>
+    `),
+  };
+}
+
+// ── 3. Final Attempt / Hold — soft break-up (48h later) ──────────────
+export function finalAttemptEmail(name: string) {
+  return {
+    subject: `One last try – Masakhe Group`,
+    html: emailWrapper(`
+      <div style="background:#192943; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">Our Final Attempt — We Don't Want to Bother You</p>
+      </div>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        We've tried calling a few times without reaching you. We don't want to keep bothering you, so we're closing your active follow-up for now.
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; font-weight:700; color:#192943; margin:0 0 8px 0;">If you still need help:</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; border-radius:3px; padding:16px 20px; margin:0 0 20px 0;">
+        <tr>
+          <td style="padding:6px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+            <span style="color:#118849; font-weight:700; margin-right:8px;">·</span>
+            Reply <strong>"Yes"</strong> and we'll call you within 1 business day at a time you specify.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:6px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+            <span style="color:#118849; font-weight:700; margin-right:8px;">·</span>
+            Or reach us on WhatsApp below at any time.
+          </td>
+        </tr>
+      </table>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#5e708d; margin:0;">
+        If we don't hear from you, we'll assume your needs have been resolved. No hard feelings — wishing you the best.
+      </p>
+    `),
+  };
+}
+
+// ── 4. Callback Confirmation ──────────────────────────────────────────
+export function callbackConfirmEmail(name: string, callbackDate: string, callbackTime: string, phone: string) {
+  return {
+    subject: `Confirming your callback – ${callbackDate}`,
+    html: emailWrapper(`
+      <div style="background:#118849; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">✅ Callback Confirmed</p>
+      </div>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 20px 0;">
+        Great speaking with you briefly! As requested, we have scheduled a callback for:
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <tr><td style="padding:8px 0; border-bottom:1px solid #dde3ea;">
+          <span style="font-family:'Open Sans',Arial,sans-serif; font-size:13px; color:#5e708d; display:block; margin-bottom:2px;">📅 Date</span>
+          <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943;">${callbackDate}</strong>
+        </td></tr>
+        <tr><td style="padding:8px 0; border-bottom:1px solid #dde3ea;">
+          <span style="font-family:'Open Sans',Arial,sans-serif; font-size:13px; color:#5e708d; display:block; margin-bottom:2px;">⏰ Time</span>
+          <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943;">${callbackTime}</strong>
+        </td></tr>
+        <tr><td style="padding:8px 0; border-bottom:1px solid #dde3ea;">
+          <span style="font-family:'Open Sans',Arial,sans-serif; font-size:13px; color:#5e708d; display:block; margin-bottom:2px;">📞 Caller</span>
+          <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943;">Masakhe Team</strong>
+        </td></tr>
+        <tr><td style="padding:8px 0;">
+          <span style="font-family:'Open Sans',Arial,sans-serif; font-size:13px; color:#5e708d; display:block; margin-bottom:2px;">📱 We'll call you at</span>
+          <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943;">${phone || "the number you provided"}</strong>
+        </td></tr>
+      </table>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#5e708d; margin:0;">
+        No need to prepare anything. If that time no longer works, just reply to this email and we'll arrange a new time.
+      </p>
+    `),
+  };
+}
+
+// ── 5. Onboarding Call Reminder ───────────────────────────────────────
+export function onboardingReminderEmail(name: string, callDate: string, callTime: string, phone: string, hoursAhead: 24 | 1) {
+  const timeLabel = hoursAhead === 24 ? "tomorrow" : "in 1 hour";
+  return {
+    subject: `Reminder – Your onboarding call ${timeLabel} at ${callTime}`,
+    html: emailWrapper(`
+      <div style="background:#0f326b; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">⏰ Your Onboarding Call is ${hoursAhead === 24 ? "Tomorrow" : "Starting in 1 Hour"}</p>
+      </div>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 20px 0;">
+        This is a quick reminder about your onboarding call:
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <tr><td style="padding:8px 0; border-bottom:1px solid #dde3ea;">
+          <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">🗓 When: ${callDate} at ${callTime}</strong>
+        </td></tr>
+        <tr><td style="padding:8px 0; border-bottom:1px solid #dde3ea;">
+          <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">📍 Where: Phone call — we'll call you at ${phone || "the number you provided"}</strong>
+        </td></tr>
+        <tr><td style="padding:8px 0;">
+          <strong style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">⏱ Duration: ~15–20 minutes</strong>
+        </td></tr>
+      </table>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; font-weight:700; color:#192943; margin:0 0 8px 0;">What we'll cover:</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px 0;">
+        ${["Quick account setup / welcome walkthrough", "Answer any questions you have", "Next steps after this call"].map(item => `
+        <tr><td style="padding:5px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+          <span style="color:#118849; font-weight:700; margin-right:8px;">✓</span>${item}
+        </td></tr>`).join("")}
+      </table>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:13px; color:#5e708d; margin:0;">
+        Can't make it? Just reply <strong>"reschedule"</strong> and we'll arrange a new time.
+      </p>
+    `),
+  };
+}
+
+// ── 6. Missed Appointment ─────────────────────────────────────────────
+export function missedAppointmentEmail(name: string, scheduledTime: string) {
+  return {
+    subject: `We missed you — let's find a new time`,
+    html: emailWrapper(`
+      <div style="background:#f59e0b; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">We Missed You — No Worries</p>
+      </div>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        We were ready to call you at <strong>${scheduledTime}</strong> for your onboarding, but we weren't able to connect. No worries — things come up.
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 20px 0;">
+        Simply reply to this email with a new day and time that works for you, or reach out on WhatsApp below and we'll get you sorted.
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:13px; color:#5e708d; margin:0;">
+        If you've already completed what you needed or changed your mind, just reply <strong>"all set"</strong>. Otherwise, we'll hold your spot for one week before closing your file.
+      </p>
+    `),
+  };
+}
+
+// ── 7. Client Onboarding Complete ─────────────────────────────────────
+export function onboardingCompleteEmail(name: string) {
+  return {
+    subject: `Welcome aboard — here's what's next`,
+    html: emailWrapper(`
+      <div style="background:#118849; border-radius:3px; padding:20px 24px; margin-bottom:24px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif; font-size:18px; font-weight:700; color:#ffffff; margin:0;">🎉 Welcome to Masakhe — Onboarding Complete!</p>
+      </div>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 16px 0;">
+        Hi <strong>${name}</strong>,
+      </p>
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:15px; color:#192943; line-height:1.7; margin:0 0 20px 0;">
+        Great speaking with you today! This email confirms your onboarding is complete.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6; border-radius:3px; padding:16px 20px; margin:0 0 24px 0;">
+        <tr><td style="padding:4px 0; font-family:'Open Sans',Arial,sans-serif; font-size:13px; font-weight:700; color:#5e708d; text-transform:uppercase; letter-spacing:0.5px;">✅ What's been set up</td></tr>
+        ${["Your account is active and ready to use", "Your dedicated support contact has been assigned", "Next steps have been confirmed"].map(item => `
+        <tr><td style="padding:5px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+          <span style="color:#118849; font-weight:700; margin-right:8px;">·</span>${item}
+        </td></tr>`).join("")}
+      </table>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4; border:1px solid #86efac; border-radius:3px; padding:16px 20px; margin:0 0 24px 0;">
+        <tr><td style="padding:4px 0; font-family:'Open Sans',Arial,sans-serif; font-size:13px; font-weight:700; color:#15803d; text-transform:uppercase; letter-spacing:0.5px;">📄 Resources for you</td></tr>
+        <tr><td style="padding:8px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+          Support: <strong>hello@masakhegroup.co.za</strong>
+        </td></tr>
+        <tr><td style="padding:4px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+          WhatsApp: <strong>+27 81 038 3955</strong>
+        </td></tr>
+        <tr><td style="padding:4px 0; font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#192943;">
+          Portal: <a href="https://www.masakheportal.co.za" style="color:#118849; font-weight:700;">www.masakheportal.co.za</a>
+        </td></tr>
+      </table>
+
+      <p style="font-family:'Open Sans',Arial,sans-serif; font-size:14px; color:#5e708d; margin:0;">
+        If anything isn't clear, just reply to this email — we're personally here to help for the next 48 hours. Welcome again!
+      </p>
+    `),
+  };
+}
+
 // ── Stage 1: Initial Contact ─────────────────────────────────────────
 export function stage1Email(name: string, business: string) {
   return {

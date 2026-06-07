@@ -13,15 +13,14 @@ const STAGES = [
 ];
 
 const EMAIL_STAGES = [
-  { value: "stage1",     label: "Stage 1: Initial Contact" },
-  { value: "stage2",     label: "Stage 2: Product Introduction" },
-  { value: "stage3",     label: "Stage 3: Demo Scheduling" },
-  { value: "stage4_1",   label: "Follow-up #1 (24h)" },
-  { value: "stage4_2",   label: "Follow-up #2 (48h)" },
-  { value: "stage4_3",   label: "Follow-up #3 (72h)" },
-  { value: "stage5",     label: "Stage 5: Booking Confirmation" },
-  { value: "reminder24", label: "Reminder: 24h before demo" },
-  { value: "reminder1",  label: "Reminder: 1h before demo" },
+  { value: "attempt1",            label: "Connection Attempt #1" },
+  { value: "attempt2",            label: "Connection Attempt #2 (24h)" },
+  { value: "final_attempt",       label: "Final Attempt / Hold (48h)" },
+  { value: "callback_confirm",    label: "Callback Confirmation" },
+  { value: "reminder24",          label: "Onboarding Reminder: 24h before" },
+  { value: "reminder1",           label: "Onboarding Reminder: 1h before" },
+  { value: "missed_appt",         label: "Missed Appointment" },
+  { value: "onboarding_complete", label: "Onboarding Complete" },
 ];
 
 function fmtDate(ts: number | string | Date | null | undefined) {

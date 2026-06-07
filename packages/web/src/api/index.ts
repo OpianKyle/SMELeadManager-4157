@@ -7,6 +7,8 @@ import { createAuth } from "./auth";
 import {
   stage1Email, stage2Email, stage3Email, stage4Email, stage5Email, demoReminderEmail, emailWrapper,
   CAMPAIGN_EMAILS,
+  attempt1Email, attempt2Email, finalAttemptEmail, callbackConfirmEmail,
+  onboardingReminderEmail, missedAppointmentEmail, onboardingCompleteEmail,
 } from "./emails";
 import { sendEmail } from "./mailer";
 import { startAutomation, runAutomationTick } from "./automation";
@@ -595,6 +597,23 @@ app.post("/email/send", async (c) => {
     emailData = { subject: savedTpl.subject, html: emailWrapper(body) };
   } else {
     switch (stage) {
+      case "attempt1": emailData = attempt1Email(leadRow.name); break;
+      case "attempt2": emailData = attempt2Email(leadRow.name); break;
+      case "final_attempt": emailData = finalAttemptEmail(leadRow.name); break;
+      case "callback_confirm":
+        emailData = callbackConfirmEmail(leadRow.name, leadRow.demoDate ?? "TBD", "", leadRow.phone ?? "");
+        break;
+      case "reminder24":
+        emailData = onboardingReminderEmail(leadRow.name, leadRow.demoDate ?? "TBD", "", leadRow.phone ?? "", 24);
+        break;
+      case "reminder1":
+        emailData = onboardingReminderEmail(leadRow.name, leadRow.demoDate ?? "TBD", "", leadRow.phone ?? "", 1);
+        break;
+      case "missed_appt":
+        emailData = missedAppointmentEmail(leadRow.name, leadRow.demoDate ?? "the scheduled time");
+        break;
+      case "onboarding_complete": emailData = onboardingCompleteEmail(leadRow.name); break;
+      // Legacy stages (kept for backward compatibility)
       case "stage1": emailData = stage1Email(leadRow.name, leadRow.business ?? ""); break;
       case "stage2": emailData = stage2Email(leadRow.name, leadRow.business ?? ""); break;
       case "stage3": emailData = stage3Email(leadRow.name, slots); break;
@@ -603,12 +622,6 @@ app.post("/email/send", async (c) => {
       case "stage4_3": emailData = stage4Email(leadRow.name, 3); break;
       case "stage5":
         emailData = stage5Email(leadRow.name, leadRow.demoDate ?? "TBD", leadRow.demoLink ?? "https://meet.google.com/");
-        break;
-      case "reminder24":
-        emailData = demoReminderEmail(leadRow.name, leadRow.demoDate ?? "TBD", leadRow.demoLink ?? "https://meet.google.com/", 24);
-        break;
-      case "reminder1":
-        emailData = demoReminderEmail(leadRow.name, leadRow.demoDate ?? "TBD", leadRow.demoLink ?? "https://meet.google.com/", 1);
         break;
       default: return c.json({ error: "Unknown stage" }, 400);
     }
@@ -631,6 +644,13 @@ app.post("/email/send", async (c) => {
     });
 
     const stageMap: Record<string, string> = {
+      attempt1: "initial_contact",
+      attempt2: "follow_up",
+      final_attempt: "follow_up",
+      callback_confirm: "follow_up",
+      missed_appt: "follow_up",
+      onboarding_complete: "completed",
+      // Legacy
       stage1: "initial_contact",
       stage2: "product_intro",
       stage3: "demo_scheduling",
@@ -673,6 +693,15 @@ app.get("/email/preview/:stage", async (c) => {
   }
   let emailData: { subject: string; html: string } | null = null;
   switch (stage) {
+    case "attempt1": emailData = attempt1Email("Thabo"); break;
+    case "attempt2": emailData = attempt2Email("Thabo"); break;
+    case "final_attempt": emailData = finalAttemptEmail("Thabo"); break;
+    case "callback_confirm": emailData = callbackConfirmEmail("Thabo", "Mon 9 Jun at 10:00 AM", "10:00 AM", "+27 81 000 0000"); break;
+    case "reminder24": emailData = onboardingReminderEmail("Thabo", "Mon 9 Jun 2026", "10:00 AM", "+27 81 000 0000", 24); break;
+    case "reminder1": emailData = onboardingReminderEmail("Thabo", "Mon 9 Jun 2026", "10:00 AM", "+27 81 000 0000", 1); break;
+    case "missed_appt": emailData = missedAppointmentEmail("Thabo", "Mon 9 Jun at 10:00 AM"); break;
+    case "onboarding_complete": emailData = onboardingCompleteEmail("Thabo"); break;
+    // Legacy
     case "stage1": emailData = stage1Email("Thabo", "TechBuild Solutions"); break;
     case "stage2": emailData = stage2Email("Thabo", "TechBuild Solutions"); break;
     case "stage3": emailData = stage3Email("Thabo", sampleSlots); break;
@@ -680,8 +709,6 @@ app.get("/email/preview/:stage", async (c) => {
     case "stage4_2": emailData = stage4Email("Thabo", 2); break;
     case "stage4_3": emailData = stage4Email("Thabo", 3); break;
     case "stage5": emailData = stage5Email("Thabo", "Mon 28 Apr at 10:00 AM", "https://meet.google.com/abc-defg-hij"); break;
-    case "reminder24": emailData = demoReminderEmail("Thabo", "Mon 28 Apr at 10:00 AM", "https://meet.google.com/abc-defg-hij", 24); break;
-    case "reminder1": emailData = demoReminderEmail("Thabo", "Mon 28 Apr at 10:00 AM", "https://meet.google.com/abc-defg-hij", 1); break;
     default: return c.json({ error: "Unknown stage" }, 404);
   }
   return new Response(emailData!.html, { headers: { "Content-Type": "text/html" } });

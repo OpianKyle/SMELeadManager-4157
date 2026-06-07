@@ -1,0 +1,345 @@
+Email Process Flow & Follow-Up Sequence
+
+ 
+
+Step Trigger Purpose Email Template
+
+1 First call – No answer, no voicemail Acknowledge attempt, soft intro Connection Attempt #1
+
+2 Second call – No answer (24h later) Create urgency, offer self-service Connection Attempt #2
+
+3 Third call – No answer (48h later) Break-up email, keep door open Final Attempt / Hold
+
+4 Call successful – Client requested callback later Confirm commitment, set expectation Callback Confirmation
+
+5 Pre-onboarding – Appointment scheduled Reduce no-shows, prep client Onboarding Call Reminder
+
+6 Client missed onboarding call (no-show) Reschedule without friction Missed Appointment
+
+7 Post-onboarding – Call completed Summarise, next steps, welcome materials Client Onboarding Complete
+
+ 
+
+---
+
+ 
+
+EMAIL TEMPLATES
+
+ 
+
+1. Connection Attempt #1 – No answer, no voicemail
+
+ 
+
+Subject: We tried reaching you – [Your Company Name]
+
+ 
+
+Body:
+
+Hi [Client Name],
+
+ 
+
+This is [Your Name] from [Your Company Name]. I just tried calling you at [time] on [phone number] to [brief reason, e.g., discuss your recent inquiry / complete your account setup].
+
+ 
+
+No need to call back right now. You can simply reply to this email with the best number and time to reach you, or book a time directly here: [Calendar Link].
+
+ 
+
+We’re happy to help.
+
+ 
+
+Best regards,
+
+[Your Name]
+
+[Direct Line / Extension]
+
+ 
+
+---
+
+ 
+
+2. Connection Attempt #2 – Still no answer (24h later)
+
+ 
+
+Subject: Still trying to reach you – [Your Company Name]
+
+ 
+
+Body:
+
+Hi [Client Name],
+
+ 
+
+I tried calling again today at [time]. Since we haven’t connected yet, I want to make this easy for you.
+
+ 
+
+Quick option: Reply with “Call me [Day] at [Time]” and I’ll adjust to your schedule.
+
+ 
+
+Or handle this without a call: [Link to self-service action, e.g., “Complete your application here” / “Review your quote online”]
+
+ 
+
+I’ll try one more time tomorrow. If I miss you again, I’ll assume you prefer email – just let me know.
+
+ 
+
+Thanks,
+
+[Your Name]
+
+ 
+
+---
+
+ 
+
+3. Final Attempt / Hold (48h later – soft break-up)
+
+ 
+
+Subject: One last try – [Your Company Name]
+
+ 
+
+Body:
+
+Hi [Client Name],
+
+ 
+
+I’ve tried calling a few times without reaching you. I don’t want to keep bothering you, so I’m closing your active follow-up for now.
+
+ 
+
+If you still need help:
+
+ 
+
+· Reply “Yes” and I’ll call you within 1 business day at a time you specify.
+
+· Or reach us directly at [Support Email / Phone]
+
+ 
+
+If I don’t hear from you, I’ll assume your needs have been resolved. No hard feelings.
+
+ 
+
+Wishing you the best,
+
+[Your Name]
+
+ 
+
+---
+
+ 
+
+4. Callback Confirmation (client answered and requested a future callback)
+
+ 
+
+Subject: Confirming your callback request – [Date/Time]
+
+ 
+
+Body:
+
+Hi [Client Name],
+
+ 
+
+Great speaking with you briefly! As requested, I have scheduled a callback for:
+
+ 
+
+📅 Date: [Date]
+
+⏰ Time: [Time] (your timezone)
+
+📞 Caller: [Your Name] from [Your Company Name]
+
+ 
+
+No need to prepare anything. I will call you directly at [Client’s Phone Number].
+
+ 
+
+If that time no longer works, just click here to reschedule: [Reschedule Link]
+
+ 
+
+I look forward to finishing our conversation.
+
+ 
+
+Best,
+
+[Your Name]
+
+ 
+
+---
+
+ 
+
+5. Onboarding Call Reminder (24h or 1h before scheduled call)
+
+ 
+
+Subject: Reminder – Your onboarding call tomorrow at [Time]
+
+ 
+
+Body:
+
+Hi [Client Name],
+
+ 
+
+This is a quick reminder about your onboarding call:
+
+ 
+
+🗓 When: [Date] at [Time]
+
+📍 Where: Phone call – I will call you at [Client’s Phone Number]
+
+⏱ Duration: ~[15-20] minutes
+
+ 
+
+What we’ll cover:
+
+ 
+
+· Quick account setup / welcome walkthrough
+
+· Answer any questions you have
+
+· Next steps after this call
+
+ 
+
+Can’t make it? Just reply “reschedule” and I’ll send you a link to pick a new time.
+
+ 
+
+Talk soon,
+
+[Your Name]
+
+ 
+
+---
+
+ 
+
+6. Missed Appointment (client did not answer at scheduled onboarding time)
+
+ 
+
+Subject: We missed you – let’s find a new time
+
+ 
+
+Body:
+
+Hi [Client Name],
+
+ 
+
+I was ready to call you at [scheduled time] for your onboarding, but we weren’t able to connect.
+
+ 
+
+No worries – things come up.
+
+ 
+
+Please pick a new time here: [Rescheduling Calendar Link]
+
+ 
+
+If you’ve already completed what you needed or changed your mind, just let me know by replying “all set”. Otherwise, I’ll hold your spot for one week before closing your file.
+
+ 
+
+Happy to help whenever you’re ready.
+
+ 
+
+Best,
+
+[Your Name]
+
+ 
+
+---
+
+ 
+
+7. Client Onboarding Complete (post-call follow-up)
+
+ 
+
+Subject: Welcome aboard – here’s what’s next
+
+ 
+
+Body:
+
+Hi [Client Name],
+
+ 
+
+Great speaking with you today! This email confirms your onboarding is complete.
+
+ 
+
+✅ What’s been set up:
+
+ 
+
+· [Item 1, e.g., Your account is active]
+
+· [Item 2, e.g., First payment scheduled for Date]
+
+ 
+
+📄 Resources for you:
+
+ 
+
+· [Link to Welcome Guide]
+
+· [Link to Support Portal / FAQ]
+
+· Your dedicated support number: [Phone Number]
+
+ 
+
+Next step from you: [One clear action, if any, e.g., “Log in and update your preferences by Friday”]
+
+ 
+
+If anything isn’t clear, just reply to this email – I’m personally here to help for the next 48 hours.
+
+ 
+
+Welcome again,
+
+[Your Name]
