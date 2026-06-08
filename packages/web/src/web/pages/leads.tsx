@@ -82,9 +82,9 @@ function downloadAllVCards(leads: any[]) {
 
 // ── Lead Drawer ──────────────────────────────────────────────────────
 function LeadDrawer({
-  lead, user, onClose, onUpdate, onDelete,
+  lead, user, agents, onClose, onUpdate, onDelete,
 }: {
-  lead: any; user: any; onClose: () => void;
+  lead: any; user: any; agents: any[]; onClose: () => void;
   onUpdate: (id: string, patch: any) => void;
   onDelete: (id: string) => void;
 }) {
@@ -106,6 +106,7 @@ function LeadDrawer({
   const canEdit      = user && ["super_admin", "admin", "agent"].includes(user.role);
   const canDelete    = user && ["super_admin", "admin"].includes(user.role);
   const canWhatsApp  = user && ["super_admin", "admin"].includes(user.role);
+  const canAssign    = user && ["super_admin", "admin"].includes(user.role);
 
   useEffect(() => {
     loadNotes();
@@ -313,6 +314,46 @@ function LeadDrawer({
               {" · "} Last email: <strong>{fmtShort(lead.lastEmailAt)}</strong>
             </div>
           </Section>
+
+          {/* Assign to Agent */}
+          {canAssign && (
+            <Section title="Assign to Agent">
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <select
+                  value={lead.assignedTo ?? ""}
+                  onChange={async e => {
+                    const val = e.target.value || null;
+                    await api.put(`/leads/${lead.id}`, { assignedTo: val });
+                    const agentName = val ? (agents.find(a => a.id === val)?.name ?? null) : null;
+                    onUpdate(lead.id, { assignedTo: val, assignedToName: agentName });
+                    showToast(val ? `Assigned to ${agentName}` : "Assignment removed");
+                  }}
+                  style={{
+                    flex: 1, padding: "8px 10px", border: "1px solid #d1d9e0",
+                    borderRadius: 4, fontSize: 13, fontFamily: "'Open Sans',Arial,sans-serif",
+                    color: "#192943", background: "#fff", cursor: "pointer",
+                  }}
+                >
+                  <option value="">— Unassigned —</option>
+                  {agents.map(a => (
+                    <option key={a.id} value={a.id}>{a.name}</option>
+                  ))}
+                </select>
+                {lead.assignedTo && (
+                  <div style={{
+                    fontSize: 12, color: "#118849", fontWeight: 600, whiteSpace: "nowrap",
+                  }}>
+                    ✓ {lead.assignedToName ?? "Assigned"}
+                  </div>
+                )}
+              </div>
+              {agents.length === 0 && (
+                <div style={{ fontSize: 12, color: "#9eafc2", marginTop: 6 }}>
+                  No agents available to assign.
+                </div>
+              )}
+            </Section>
+          )}
 
           {/* Send email */}
           {canEdit && (
@@ -703,11 +744,13 @@ function btnStyle(bg: string, color: string, solid = false): React.CSSProperties
 export default function Leads() {
   const [leads, setLeads]       = useState<any[]>([]);
   const [user, setUser]         = useState<any>(null);
+  const [agents, setAgents]     = useState<any[]>([]);
   const [showAdd, setShowAdd]   = useState(false);
   const [sending, setSending]   = useState<string | null>(null);
   const [toast, setToast]       = useState("");
   const [search, setSearch]     = useState("");
   const [stageFilter, setStageFilter] = useState("all");
+  const [agentFilter, setAgentFilter] = useState("all");
   const [selected, setSelected] = useState<any>(null);
   const [form, setForm]         = useState({ name: "", email: "", phone: "", business: "", source: "manual", notes: "" });
   const [googleConnected, setGoogleConnected] = useState(false);
@@ -726,7 +769,12 @@ export default function Leads() {
 
   useEffect(() => {
     load();
-    api.get("/me").then(r => r.json()).then(d => setUser(d.user));
+    api.get("/me").then(r => r.json()).then(d => {
+      setUser(d.user);
+      if (d.user && ["super_admin", "admin"].includes(d.user.role)) {
+        api.get("/users/agents").then(r => r.json()).then(ad => setAgents(ad.agents ?? [])).catch(() => {});
+      }
+    });
     checkGoogleStatus();
 
     const onMessage = (e: MessageEvent) => {
@@ -823,7 +871,12 @@ export default function Leads() {
       (l.business ?? "").toLowerCase().includes(q) ||
       (l.phone ?? "").includes(q);
     const matchStage = stageFilter === "all" || l.stage === stageFilter;
-    return matchSearch && matchStage;
+    const matchAgent = agentFilter === "all"
+      ? true
+      : agentFilter === "unassigned"
+        ? !l.assignedTo
+        : l.assignedTo === agentFilter;
+    return matchSearch && matchStage && matchAgent;
   });
 
   const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -833,7 +886,7 @@ export default function Leads() {
   const pageEnd     = Math.min(safePage * PAGE_SIZE, filtered.length);
 
   // Reset to page 1 whenever the filter changes
-  useEffect(() => { setPage(1); }, [search, stageFilter]);
+  useEffect(() => { setPage(1); }, [search, stageFilter, agentFilter]);
 
   return (
     <Layout>
@@ -1086,6 +1139,16 @@ export default function Leads() {
           <option value="all">All Stages</option>
           {STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
+        {showCreatedBy && agents.length > 0 && (
+          <select value={agentFilter} onChange={e => setAgentFilter(e.target.value)} style={{
+            padding: "9px 14px", border: "1px solid #d1d9e0", borderRadius: 3,
+            fontSize: 14, fontFamily: "'Open Sans', Arial, sans-serif", color: "#192943",
+          }}>
+            <option value="all">All Agents</option>
+            <option value="unassigned">Unassigned</option>
+            {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        )}
       </div>
 
       {/* Desktop Table */}
@@ -1093,7 +1156,7 @@ export default function Leads() {
         <table className="leads-table">
           <thead>
             <tr style={{ background: "#192943" }}>
-              {["Name", "Business", "Email", "Phone", "Stage", "Follow-ups", "Last Email", ...(showCreatedBy ? ["Created By"] : []), "Actions"].map(h => (
+              {["Name", "Business", "Email", "Phone", "Stage", "Follow-ups", "Last Email", ...(showCreatedBy ? ["Created By", "Assigned To"] : []), "Actions"].map(h => (
                 <th key={h} style={{
                   padding: "9px 10px", textAlign: "left", fontSize: 10,
                   fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: "0.8px",
@@ -1144,6 +1207,13 @@ export default function Leads() {
                       {l.createdByName ?? <span style={{ color: "#ccc" }}>—</span>}
                     </td>
                   )}
+                  {showCreatedBy && (
+                    <td style={{ padding: "8px 10px", fontSize: 12 }}>
+                      {l.assignedToName
+                        ? <span style={{ color: "#118849", fontWeight: 600 }}>{l.assignedToName}</span>
+                        : <span style={{ color: "#ccc" }}>—</span>}
+                    </td>
+                  )}
                   <td style={{ padding: "8px 10px" }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       {canEdit && (
@@ -1175,7 +1245,7 @@ export default function Leads() {
               );
             })}
             {paginated.length === 0 && (
-              <tr><td colSpan={showCreatedBy ? 9 : 8} style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
+              <tr><td colSpan={showCreatedBy ? 10 : 8} style={{ padding: "32px", textAlign: "center", fontSize: 14, color: "#5e708d" }}>
                 No leads found. Add your first lead to get started.
               </td></tr>
             )}
@@ -1244,6 +1314,9 @@ export default function Leads() {
                   }}>Needs Human</span>
                 )}
                 {l.lastEmailAt && <span>Last email: {fmtShort(l.lastEmailAt)}</span>}
+                {showCreatedBy && l.assignedToName && (
+                  <span style={{ color: "#118849", fontWeight: 600 }}>👤 {l.assignedToName}</span>
+                )}
               </div>
               <div className="lead-card-actions" onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 8 }}>
                 {canEdit && (
@@ -1312,6 +1385,7 @@ export default function Leads() {
         <LeadDrawer
           lead={selected}
           user={user}
+          agents={agents}
           onClose={() => setSelected(null)}
           onUpdate={handleUpdate}
           onDelete={deleteLead}

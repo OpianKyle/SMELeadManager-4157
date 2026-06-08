@@ -203,6 +203,24 @@ app.get("/me", (c) => {
   return c.json({ user: u }, 200);
 });
 
+// ── Agents list for lead assignment ──────────────────────────────────
+app.get("/users/agents", async (c) => {
+  const err = requireRole(c, ["super_admin", "admin"]);
+  if (err) return err;
+  const u = c.get("user")!;
+  let agents;
+  if (u.role === "admin") {
+    agents = await db().select({ id: schema.user.id, name: schema.user.name, role: schema.user.role })
+      .from(schema.user)
+      .where(eq(schema.user.managerId, u.id));
+  } else {
+    agents = await db().select({ id: schema.user.id, name: schema.user.name, role: schema.user.role })
+      .from(schema.user)
+      .where(inArray(schema.user.role, ["agent", "admin"]));
+  }
+  return c.json({ agents }, 200);
+});
+
 // ── Users CRUD (super_admin / admin only) ────────────────────────────
 app.get("/users", async (c) => {
   const err = requireRole(c, ["super_admin", "admin"]);
@@ -462,6 +480,7 @@ app.get("/leads", async (c) => {
   const leadsWithCreator = leads.map(l => ({
     ...l,
     createdByName: l.createdBy ? (userMap.get(l.createdBy) ?? null) : null,
+    assignedToName: l.assignedTo ? (userMap.get(l.assignedTo) ?? null) : null,
   }));
   return c.json({ leads: leadsWithCreator }, 200);
 });
@@ -552,6 +571,10 @@ app.put("/leads/:id", async (c) => {
     logActivity({ user: u, action: "lead_stage_changed", entity: "lead", entityId: id, details: { leadName: before?.name, from: before?.stage, to: body.stage } });
   } else if (body.optedOut !== undefined) {
     logActivity({ user: u, action: body.optedOut ? "lead_opted_out" : "lead_opted_in", entity: "lead", entityId: id, details: { leadName: before?.name } });
+  } else if ("assignedTo" in body) {
+    const allUsers = await db().select({ id: schema.user.id, name: schema.user.name }).from(schema.user);
+    const agentName = body.assignedTo ? (allUsers.find(u2 => u2.id === body.assignedTo)?.name ?? "Unknown") : null;
+    logActivity({ user: u, action: "lead_assigned", entity: "lead", entityId: id, details: { leadName: before?.name, assignedTo: agentName } });
   } else {
     logActivity({ user: u, action: "lead_updated", entity: "lead", entityId: id, details: { leadName: before?.name, changes: Object.keys(body).join(", ") } });
   }
