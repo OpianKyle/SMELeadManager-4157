@@ -210,9 +210,16 @@ app.get("/users/agents", async (c) => {
   const u = c.get("user")!;
   let agents;
   if (u.role === "admin") {
+    // Admins see all agents (their own team + agents without a manager assigned)
     agents = await db().select({ id: schema.user.id, name: schema.user.name, role: schema.user.role })
       .from(schema.user)
-      .where(eq(schema.user.managerId, u.id));
+      .where(
+        or(
+          eq(schema.user.managerId, u.id),
+          isNull(schema.user.managerId)
+        )
+      )
+      .then(rows => rows.filter(r => r.role === "agent"));
   } else {
     agents = await db().select({ id: schema.user.id, name: schema.user.name, role: schema.user.role })
       .from(schema.user)
