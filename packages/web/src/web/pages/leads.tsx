@@ -990,9 +990,15 @@ export default function Leads() {
         .leads-cards {
           display: none;
         }
+        .leads-pagination-mobile {
+          display: none;
+        }
         /* Tablet + Mobile cards */
         @media (max-width: 1024px) {
           .leads-table-wrap {
+            display: none;
+          }
+          .leads-pagination-desktop {
             display: none;
           }
           .leads-cards {
@@ -1255,7 +1261,7 @@ export default function Leads() {
 
       {/* Desktop pagination */}
       {totalPages > 1 && (
-        <div className="leads-pagination">
+        <div className="leads-pagination leads-pagination-desktop">
           <span className="leads-pagination-info">
             Showing {pageStart}–{pageEnd} of {filtered.length} leads
           </span>
@@ -1354,7 +1360,7 @@ export default function Leads() {
 
       {/* Mobile pagination */}
       {totalPages > 1 && (
-        <div className="leads-pagination">
+        <div className="leads-pagination leads-pagination-mobile">
           <span className="leads-pagination-info">
             Showing {pageStart}–{pageEnd} of {filtered.length} leads
           </span>
