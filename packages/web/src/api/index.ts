@@ -1024,8 +1024,13 @@ app.post("/leads/bulk", async (c) => {
       results.errors.push(e?.message ?? "Unknown error");
     }
   }
-  // Fire stage 1 for all successfully created leads (non-blocking)
-  for (const id of createdIds) maybeSendStage1(id);
+  // Fire stage 1 for all successfully created leads sequentially in the background.
+  // Sequential (not concurrent) to avoid overwhelming the SMTP server with simultaneous connections.
+  (async () => {
+    for (const id of createdIds) {
+      await maybeSendStage1(id);
+    }
+  })();
   return c.json(results, 200);
 });
 
