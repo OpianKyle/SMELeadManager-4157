@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { eq, desc, or, isNull, inArray, sql } from "drizzle-orm";
+import { eq, desc, or, isNull, inArray, sql, and } from "drizzle-orm";
 import * as schema from "./database/schema";
 import { database } from "./database";
 import { createAuth } from "./auth";
@@ -79,6 +79,22 @@ async function runMigrations() {
       // ER_DUP_ENTRY means the row already exists — skip silently
       if (e?.code !== "ER_DUP_ENTRY") console.warn("[seed] campaign step", email.stepNumber, e?.message);
     }
+  }
+
+  // One-time migration: update step 1 to the new onboarding call email.
+  // Only applies if the row still has the old subject so manual edits are never overwritten.
+  try {
+    const step1 = CAMPAIGN_EMAILS.find(e => e.stepNumber === 1);
+    if (step1) {
+      await database.update(schema.emailCampaignStep)
+        .set({ subject: step1.subject, bodyHtml: step1.bodyHtml })
+        .where(and(
+          eq(schema.emailCampaignStep.stepNumber, 1),
+          eq(schema.emailCampaignStep.subject, "One platform. Everything your SMME needs.")
+        ));
+    }
+  } catch (e: any) {
+    console.warn("[migration] step1 content update:", e?.message);
   }
 }
 runMigrations();

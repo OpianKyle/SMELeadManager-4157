@@ -675,14 +675,30 @@ function campaignBody(headline: string, paragraphs: string[], ctaText = "Start Y
 export const CAMPAIGN_EMAILS: Array<{ stepNumber: number; subject: string; bodyHtml: string; delayDays: number }> = [
   {
     stepNumber: 1, delayDays: 0,
-    subject: "One platform. Everything your SMME needs.",
-    bodyHtml: campaignBody(
-      "The All-in-One Business Platform for South African SMMEs",
-      [
-        "Running a small business means juggling a dozen tools. <strong>Masakhe</strong> brings them all together — website, invoices, payroll, CRM, social media, and finances. No more jumping between tabs.",
-        "Claim your <strong>14-day free trial</strong> and see the difference.",
-      ]
-    ),
+    subject: "Welcome to Masakhe Portal, {{name}}!",
+    bodyHtml: `
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 20px 0;">Dear <strong>{{name}}</strong>,</p>
+    <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+      <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Welcome to Masakhe Portal! 🎉</p>
+    </div>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 14px 0;">It's great news that you joined our platform! I noticed you have been a while on our system — I would like to connect with you on a call to determine your progress and how we can further assist in making it better for you.</p>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 24px 0;">Please select the link below to schedule a personal onboarding call with myself, <strong>Lance Heynes, CEO of Masakhe Technologies</strong>:</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="https://calendly.com/masakhesystems" style="display:inline-block;background:#118849;color:#ffffff;font-family:'Open Sans',Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;padding:16px 36px;border-radius:3px;">📅 Book Your Onboarding Call →</a>
+    </div>
+    <table cellpadding="0" cellspacing="0" style="width:100%;background:#f0f4f8;border-radius:4px;margin:24px 0;">
+      <tr><td style="padding:18px 22px;">
+        <p style="font-family:'Open Sans',Arial,sans-serif;font-size:14px;color:#192943;margin:0 0 10px 0;"><strong>📍 Format:</strong> &nbsp; Google Meet <em>(link sent upon confirmation)</em></p>
+        <p style="font-family:'Open Sans',Arial,sans-serif;font-size:14px;color:#192943;margin:0 0 10px 0;"><strong>🕐 Duration:</strong> &nbsp; 30 minutes</p>
+        <p style="font-family:'Open Sans',Arial,sans-serif;font-size:14px;color:#192943;margin:0;"><strong>👤 With:</strong> &nbsp; Lance Heynes, CEO of Masakhe Technologies</p>
+      </td></tr>
+    </table>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:15px;color:#192943;line-height:1.7;margin:0 0 20px 0;">Looking forward to meeting you!</p>
+    <p style="font-family:'Open Sans',Arial,sans-serif;font-size:14px;color:#192943;margin:0;line-height:1.7;">
+      <strong>Lance Heynes</strong><br>
+      <span style="color:#5e708d;">CEO, Masakhe Technologies</span>
+    </p>
+  `,
   },
   {
     stepNumber: 2, delayDays: 2,

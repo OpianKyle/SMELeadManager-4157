@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Layout } from "@/components/layout";
 import { api } from "@/lib/api";
 
@@ -198,9 +198,8 @@ export default function EmailLog() {
                 <tr><td colSpan={7} style={{ padding: 32, textAlign: "center", fontSize: 14, color: "#5e708d" }}>No emails match your filters.</td></tr>
               )}
               {!loading && pageData.map((l, i) => (
-                <>
+                <React.Fragment key={l.id}>
                   <tr
-                    key={l.id}
                     style={{ borderBottom: "1px solid #eef2f6", background: i % 2 === 0 ? "#fff" : "#fafbfc", cursor: l.error ? "pointer" : "default" }}
                     onClick={() => l.error && setExpandedError(expandedError === l.id ? null : l.id)}
                     title={l.error ? "Click to see error details" : undefined}
@@ -239,14 +238,14 @@ export default function EmailLog() {
                     </td>
                   </tr>
                   {expandedError === l.id && l.error && (
-                    <tr key={`${l.id}-err`} style={{ background: "#fff5f5" }}>
+                    <tr style={{ background: "#fff5f5" }}>
                       <td colSpan={7} style={{ padding: "10px 14px 14px" }}>
                         <div style={{ fontSize: 11, fontWeight: 700, color: "#dc2626", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>Error Details</div>
                         <code style={{ fontSize: 12, color: "#7f1d1d", background: "#fee2e2", padding: "8px 12px", borderRadius: 4, display: "block", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>{l.error}</code>
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
