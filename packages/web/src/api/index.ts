@@ -769,6 +769,69 @@ app.get("/email/logs", async (c) => {
   return c.json({ logs }, 200);
 });
 
+// ── Resend all failed emails ───────────────────────────────────────────
+app.post("/email/resend-failed", async (c) => {
+  const err = requireRole(c, ["super_admin", "admin"]);
+  if (err) return err;
+
+  // Find leads that have failed emails but zero successful emails
+  const failedLogs = await db()
+    .select({ leadId: schema.emailLog.leadId })
+    .from(schema.emailLog)
+    .where(eq(schema.emailLog.status, "failed"));
+
+  const sentLogs = await db()
+    .select({ leadId: schema.emailLog.leadId })
+    .from(schema.emailLog)
+    .where(eq(schema.emailLog.status, "sent"));
+
+  const sentLeadIds = new Set(sentLogs.map(l => l.leadId));
+  const failedLeadIds = [...new Set(failedLogs.map(l => l.leadId))]
+    .filter(id => !sentLeadIds.has(id));
+
+  if (failedLeadIds.length === 0) return c.json({ queued: 0 }, 200);
+
+  // Send sequentially in the background so the response is instant
+  (async () => {
+    const steps = await db()
+      .select()
+      .from(schema.emailCampaignStep)
+      .where(eq(schema.emailCampaignStep.enabled, true))
+      .orderBy(schema.emailCampaignStep.stepNumber);
+    const firstStep = steps[0];
+    if (!firstStep) return;
+
+    for (const leadId of failedLeadIds) {
+      try {
+        const [lead] = await db().select().from(schema.lead).where(eq(schema.lead.id, leadId));
+        if (!lead || lead.optedOut) continue;
+
+        const bodyHtml = firstStep.bodyHtml
+          .replace(/\{\{name\}\}/g, lead.name)
+          .replace(/\{\{business\}\}/g, lead.business ?? "your business");
+        const subject = firstStep.subject
+          .replace(/\{\{name\}\}/g, lead.name)
+          .replace(/\{\{business\}\}/g, lead.business ?? "your business");
+
+        await db().update(schema.lead)
+          .set({ lastEmailAt: new Date(), updatedAt: new Date() })
+          .where(eq(schema.lead.id, leadId));
+        await sendEmail({ to: lead.email, subject, html: emailWrapper(bodyHtml) });
+        await db().insert(schema.emailLog).values({
+          id: crypto.randomUUID(), leadId: lead.id,
+          stage: `campaign_${firstStep.stepNumber}`,
+          subject, sentBy: "auto", status: "sent",
+        });
+        console.log(`[resend] Sent to ${lead.email}`);
+      } catch (e: any) {
+        console.error(`[resend] Failed for lead ${leadId}:`, e.message);
+      }
+    }
+  })();
+
+  return c.json({ queued: failedLeadIds.length }, 200);
+});
+
 // ── Workflow config ────────────────────────────────────────────────────
 app.get("/workflow/config", async (c) => {
   const err = requireAuth(c);

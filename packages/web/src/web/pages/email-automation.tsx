@@ -36,6 +36,7 @@ export default function EmailAutomation() {
   const [toast, setToast]       = useState("");
   const [user, setUser]         = useState<any>(null);
   const [tab, setTab]           = useState<"templates"|"log">("templates");
+  const [resending, setResending] = useState(false);
 
   // Edit state — one card open at a time
   const [editId, setEditId]         = useState<string | null>(null);
@@ -100,6 +101,22 @@ export default function EmailAutomation() {
       for (const t of (d.templates ?? [])) map[t.id] = t;
       setSaved(map);
     });
+  };
+
+  const resendFailed = async () => {
+    if (!confirm("This will resend the first campaign email to all leads that only have failed emails and never received a successful one. Continue?")) return;
+    setResending(true);
+    try {
+      const res = await api.post("/email/resend-failed", {});
+      const data = await res.json() as any;
+      if (data.queued === 0) showToast("✅ No failed leads to resend — all caught up!");
+      else showToast(`✅ Queued ${data.queued} lead${data.queued === 1 ? "" : "s"} for resend. Emails are sending in the background.`);
+      setTimeout(() => api.get("/email/logs").then(r => r.json()).then(d => setLogs(d.logs ?? [])), 3000);
+    } catch {
+      showToast("❌ Request failed — please try again");
+    } finally {
+      setResending(false);
+    }
   };
 
   const canEdit = user && ["super_admin", "admin"].includes(user.role);
@@ -293,8 +310,32 @@ export default function EmailAutomation() {
       {/* Send Log */}
       {tab === "log" && (
         <div style={{ background: "#fff", borderRadius: 4, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", overflow: "hidden" }}>
-          <div style={{ background: "#192943", padding: "14px 20px" }}>
-            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#fff" }}>Email Send Log</h2>
+          <div style={{ background: "#192943", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#fff" }}>Email Send Log</h2>
+              {logs.filter(l => l.status === "failed").length > 0 && (
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>
+                  {logs.filter(l => l.status === "failed").length} failed entr{logs.filter(l => l.status === "failed").length === 1 ? "y" : "ies"} visible
+                </div>
+              )}
+            </div>
+            {canEdit && (
+              <button
+                onClick={resendFailed}
+                disabled={resending}
+                style={{
+                  padding: "8px 16px", borderRadius: 4, border: "none",
+                  background: resending ? "#5e708d" : "#dc2626",
+                  color: "#fff", fontWeight: 700, fontSize: 13,
+                  cursor: resending ? "not-allowed" : "pointer",
+                  fontFamily: "'Open Sans',Arial,sans-serif",
+                  opacity: resending ? 0.8 : 1,
+                  display: "flex", alignItems: "center", gap: 6,
+                }}
+              >
+                {resending ? "⏳ Sending..." : "🔄 Resend Failed"}
+              </button>
+            )}
           </div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
