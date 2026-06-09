@@ -82,10 +82,10 @@ export async function runAutomationTick() {
         const createdAt = lead.createdAt instanceof Date ? lead.createdAt : new Date(lead.createdAt as any);
         if (createdAt < tenMinsAgo) continue;
 
-        // Extra guard: check email log — never send stage1 twice
+        // Extra guard: skip if any email has already been sent (stage1 or any campaign_* step)
         const existingLogs = await database.select().from(schema.emailLog)
           .where(eq(schema.emailLog.leadId, lead.id));
-        if (existingLogs.some(l => l.stage === "stage1")) continue;
+        if (existingLogs.some(l => l.stage === "stage1" || l.stage.startsWith("campaign_"))) continue;
 
         try {
           const email = stage1Email(lead.name, lead.business ?? "");

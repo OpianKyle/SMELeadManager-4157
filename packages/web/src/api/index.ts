@@ -518,14 +518,15 @@ async function maybeSendStage1(leadId: string) {
       .replace(/\{\{name\}\}/g, lead.name)
       .replace(/\{\{business\}\}/g, lead.business ?? "your business");
 
+    // Mark lastEmailAt BEFORE sending to prevent race condition with automation tick
+    await db().update(schema.lead)
+      .set({ lastEmailAt: new Date(), updatedAt: new Date() })
+      .where(eq(schema.lead.id, leadId));
     await sendEmail({ to: lead.email, subject, html: emailWrapper(bodyHtml) });
     await db().insert(schema.emailLog).values({
       id: crypto.randomUUID(), leadId: lead.id, stage: `campaign_${firstStep.stepNumber}`,
       subject, sentBy: "auto", status: "sent",
     });
-    await db().update(schema.lead)
-      .set({ lastEmailAt: new Date(), updatedAt: new Date() })
-      .where(eq(schema.lead.id, leadId));
     console.log(`[automation] Campaign step 1 sent immediately to ${lead.email}`);
   } catch (e: any) {
     console.error(`[automation] Immediate stage 1 failed for lead ${leadId}:`, e.message);
