@@ -20,7 +20,10 @@ const PAGE_SIZE = 50;
 
 function fmtDate(v: string | number) {
   const d = v instanceof Date ? v : new Date(typeof v === "number" ? v * 1000 : v);
-  return d.toLocaleString("en-ZA", { dateStyle: "medium", timeStyle: "short" });
+  return d.toLocaleString("en-ZA", {
+    dateStyle: "medium", timeStyle: "short",
+    timeZone: "Africa/Johannesburg",
+  });
 }
 
 function stageLabel(stage: string) {

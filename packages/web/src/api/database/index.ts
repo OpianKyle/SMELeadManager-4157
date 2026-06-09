@@ -29,6 +29,10 @@ const pool = mysql.createPool({
   keepAliveInitialDelay: 10000,
   // Reconnect automatically when a connection is lost
   idleTimeout: 60000,
+  // MySQL server is on South African hosting (SAST = UTC+2).
+  // Without this, mysql2 treats all timestamp strings as UTC, making every
+  // time appear 2 hours ahead when displayed in the browser.
+  timezone: "+02:00",
 });
 
 export const database = drizzle(pool, { schema, mode: "default" });
