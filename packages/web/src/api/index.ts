@@ -750,11 +750,31 @@ app.get("/email/logs", async (c) => {
   const err = requireAuth(c);
   if (err) return err;
   const u = c.get("user")!;
+
+  const cols = {
+    id: schema.emailLog.id,
+    leadId: schema.emailLog.leadId,
+    stage: schema.emailLog.stage,
+    subject: schema.emailLog.subject,
+    sentAt: schema.emailLog.sentAt,
+    sentBy: schema.emailLog.sentBy,
+    status: schema.emailLog.status,
+    error: schema.emailLog.error,
+    leadName: schema.lead.name,
+    leadEmail: schema.lead.email,
+    leadBusiness: schema.lead.business,
+  };
+
   if (u.role === "super_admin") {
-    const logs = await db().select().from(schema.emailLog).orderBy(desc(schema.emailLog.sentAt)).limit(100);
+    const logs = await db()
+      .select(cols)
+      .from(schema.emailLog)
+      .leftJoin(schema.lead, eq(schema.emailLog.leadId, schema.lead.id))
+      .orderBy(desc(schema.emailLog.sentAt))
+      .limit(1000);
     return c.json({ logs }, 200);
   }
-  // Scope to leads owned by the user and their team
+
   let scopeUserIds = [u.id];
   if (u.role === "admin") {
     const agents = await db().select({ id: schema.user.id }).from(schema.user).where(eq(schema.user.managerId, u.id));
@@ -763,9 +783,13 @@ app.get("/email/logs", async (c) => {
   const scopedLeads = await db().select({ id: schema.lead.id }).from(schema.lead)
     .where(inArray(schema.lead.createdBy, scopeUserIds));
   if (scopedLeads.length === 0) return c.json({ logs: [] }, 200);
-  const logs = await db().select().from(schema.emailLog)
+  const logs = await db()
+    .select(cols)
+    .from(schema.emailLog)
+    .leftJoin(schema.lead, eq(schema.emailLog.leadId, schema.lead.id))
     .where(inArray(schema.emailLog.leadId, scopedLeads.map(l => l.id)))
-    .orderBy(desc(schema.emailLog.sentAt)).limit(100);
+    .orderBy(desc(schema.emailLog.sentAt))
+    .limit(1000);
   return c.json({ logs }, 200);
 });
 

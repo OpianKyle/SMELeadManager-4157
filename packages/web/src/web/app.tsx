@@ -16,6 +16,7 @@ import Media from "./pages/media";
 import EmailCampaign from "./pages/email-campaign";
 import Signups from "./pages/signups";
 import Subscriptions from "./pages/subscriptions";
+import EmailLog from "./pages/email-log";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path="/email-campaign" component={EmailCampaign} />
         <Route path="/signups" component={Signups} />
         <Route path="/subscriptions" component={Subscriptions} />
+        <Route path="/email-log" component={EmailLog} />
       </Switch>
       {import.meta.env.DEV && <AgentFeedback />}
     </Provider>
