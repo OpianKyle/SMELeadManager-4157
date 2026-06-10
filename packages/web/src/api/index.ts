@@ -618,6 +618,25 @@ app.delete("/leads/:id", async (c) => {
   return c.json({ success: true }, 200);
 });
 
+// ── Bulk assign leads ─────────────────────────────────────────────────
+app.put("/leads/bulk-assign", async (c) => {
+  const err = requireRole(c, ["super_admin", "admin"]);
+  if (err) return err;
+  const u = c.get("user")!;
+  const { leadIds, agentId } = await c.req.json() as { leadIds: string[]; agentId: string | null };
+  if (!Array.isArray(leadIds) || leadIds.length === 0) {
+    return c.json({ error: "leadIds array required" }, 400);
+  }
+  const [agent] = agentId
+    ? await db().select({ name: schema.user.name }).from(schema.user).where(eq(schema.user.id, agentId))
+    : [null];
+  await db().update(schema.lead)
+    .set({ assignedTo: agentId ?? null, updatedAt: new Date() })
+    .where(inArray(schema.lead.id, leadIds));
+  logActivity({ user: u, action: "leads_bulk_assigned", entity: "lead", details: { count: leadIds.length, agentId, agentName: agent?.name ?? null } });
+  return c.json({ success: true, count: leadIds.length }, 200);
+});
+
 // ── Email Send ────────────────────────────────────────────────────────
 app.post("/email/send", async (c) => {
   const err = requireRole(c, ["super_admin", "admin", "agent"]);

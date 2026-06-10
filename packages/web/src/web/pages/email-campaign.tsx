@@ -18,7 +18,7 @@ export default function EmailCampaign() {
     api.get("/me").then(r => r.json()).then(d => setCurrentUser(d.user));
   }, []);
 
-  const canEdit = currentUser?.role === "super_admin";
+  const canEdit = currentUser?.role === "super_admin" || currentUser?.role === "admin";
 
   const load = () => {
     setFetching(true);

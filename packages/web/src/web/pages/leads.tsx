@@ -758,6 +758,9 @@ export default function Leads() {
   const [syncing, setSyncing]   = useState(false);
   const [syncMsg, setSyncMsg]   = useState("");
   const [page, setPage]         = useState(1);
+  const [checkedIds, setCheckedIds]   = useState<Set<string>>(new Set());
+  const [bulkAgentId, setBulkAgentId] = useState("");
+  const [bulkAssigning, setBulkAssigning] = useState(false);
 
   const PAGE_SIZE = 25;
 
@@ -854,6 +857,39 @@ export default function Leads() {
     showToast("Lead deleted");
   };
 
+  const toggleCheck = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCheckedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const allFilteredChecked = filtered.length > 0 && filtered.every(l => checkedIds.has(l.id));
+
+  const toggleAllFiltered = () => {
+    if (allFilteredChecked) setCheckedIds(new Set());
+    else setCheckedIds(new Set(filtered.map(l => l.id)));
+  };
+
+  const bulkAssign = async () => {
+    if (!bulkAgentId || checkedIds.size === 0) return;
+    setBulkAssigning(true);
+    const agentName = agents.find(a => a.id === bulkAgentId)?.name ?? null;
+    const res = await api.put("/leads/bulk-assign", { leadIds: [...checkedIds], agentId: bulkAgentId });
+    const data = await res.json();
+    if (data.success) {
+      setLeads(prev => prev.map(l => checkedIds.has(l.id) ? { ...l, assignedTo: bulkAgentId, assignedToName: agentName } : l));
+      showToast(`✅ Assigned ${checkedIds.size} lead${checkedIds.size !== 1 ? "s" : ""} to ${agentName}`);
+      setCheckedIds(new Set());
+      setBulkAgentId("");
+    } else {
+      showToast("❌ " + (data.error ?? "Failed to assign"));
+    }
+    setBulkAssigning(false);
+  };
+
   const handleUpdate = (id: string, patch: any) => {
     setLeads(prev => prev.map(l => l.id === id ? { ...l, ...patch } : l));
     if (selected?.id === id) setSelected((p: any) => ({ ...p, ...patch }));
@@ -885,8 +921,8 @@ export default function Leads() {
   const pageStart   = filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
   const pageEnd     = Math.min(safePage * PAGE_SIZE, filtered.length);
 
-  // Reset to page 1 whenever the filter changes
-  useEffect(() => { setPage(1); }, [search, stageFilter, agentFilter]);
+  // Reset to page 1 and clear selection whenever the filter changes
+  useEffect(() => { setPage(1); setCheckedIds(new Set()); }, [search, stageFilter, agentFilter]);
 
   return (
     <Layout>
@@ -1021,6 +1057,10 @@ export default function Leads() {
           .lead-card-selected {
             border-left-color: #118849;
             background: #f0fdf4;
+          }
+          .lead-card-checked {
+            background: #eef6ff;
+            border-left-color: #0f326b;
           }
           .lead-card-top {
             display: flex;
@@ -1157,11 +1197,64 @@ export default function Leads() {
         )}
       </div>
 
+      {/* Bulk action bar */}
+      {checkedIds.size > 0 && showCreatedBy && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10, padding: "10px 16px",
+          background: "#0f326b", borderRadius: 4, marginBottom: 12, flexWrap: "wrap",
+        }}>
+          <span style={{ fontSize: 13, color: "#fff", fontWeight: 700, marginRight: 4 }}>
+            {checkedIds.size} lead{checkedIds.size !== 1 ? "s" : ""} selected
+          </span>
+          <select
+            value={bulkAgentId}
+            onChange={e => setBulkAgentId(e.target.value)}
+            style={{
+              padding: "6px 10px", borderRadius: 3, border: "none", fontSize: 13,
+              fontFamily: "'Open Sans',Arial,sans-serif", color: "#192943",
+            }}
+          >
+            <option value="">— Select agent to assign —</option>
+            {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+          <button
+            onClick={bulkAssign}
+            disabled={!bulkAgentId || bulkAssigning}
+            style={{
+              padding: "6px 16px", background: bulkAgentId ? "#118849" : "#4a6080",
+              color: "#fff", border: "none", borderRadius: 3, fontSize: 13,
+              fontWeight: 700, cursor: bulkAgentId ? "pointer" : "default",
+              fontFamily: "'Open Sans',Arial,sans-serif",
+            }}
+          >{bulkAssigning ? "Assigning…" : "Assign"}</button>
+          <button
+            onClick={() => { setCheckedIds(new Set()); setBulkAgentId(""); }}
+            style={{
+              padding: "6px 14px", background: "rgba(255,255,255,0.12)",
+              color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 3,
+              fontSize: 13, fontWeight: 600, cursor: "pointer",
+              fontFamily: "'Open Sans',Arial,sans-serif",
+            }}
+          >Clear</button>
+        </div>
+      )}
+
       {/* Desktop Table */}
       <div className="leads-table-wrap">
         <table className="leads-table">
           <thead>
             <tr style={{ background: "#192943" }}>
+              {showCreatedBy && (
+                <th style={{ padding: "9px 10px", textAlign: "center", width: 36 }}>
+                  <input
+                    type="checkbox"
+                    checked={allFilteredChecked}
+                    onChange={toggleAllFiltered}
+                    title={allFilteredChecked ? "Deselect all" : "Select all"}
+                    style={{ cursor: "pointer", accentColor: "#118849", width: 14, height: 14 }}
+                  />
+                </th>
+              )}
               {["Name", "Business", "Email", "Phone", "Stage", "Follow-ups", "Last Email", ...(showCreatedBy ? ["Created By", "Assigned To"] : []), "Actions"].map(h => (
                 <th key={h} style={{
                   padding: "9px 10px", textAlign: "left", fontSize: 10,
@@ -1181,13 +1274,23 @@ export default function Leads() {
                   onClick={() => setSelected(l)}
                   style={{
                     borderBottom: "1px solid #eef2f6",
-                    background: isSelected ? "#eef6ff" : i % 2 === 0 ? "#fff" : "#fafbfc",
+                    background: checkedIds.has(l.id) ? "#eef6ff" : isSelected ? "#eef6ff" : i % 2 === 0 ? "#fff" : "#fafbfc",
                     cursor: "pointer",
                     transition: "background 0.1s",
                   }}
-                  onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "#f5f8ff"; }}
-                  onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? "#fff" : "#fafbfc"; }}
+                  onMouseEnter={e => { if (!isSelected && !checkedIds.has(l.id)) (e.currentTarget as HTMLElement).style.background = "#f5f8ff"; }}
+                  onMouseLeave={e => { if (!isSelected && !checkedIds.has(l.id)) (e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? "#fff" : "#fafbfc"; }}
                 >
+                  {showCreatedBy && (
+                    <td style={{ padding: "8px 10px", textAlign: "center", width: 36 }} onClick={e => toggleCheck(l.id, e)}>
+                      <input
+                        type="checkbox"
+                        checked={checkedIds.has(l.id)}
+                        onChange={() => {}}
+                        style={{ cursor: "pointer", accentColor: "#118849", width: 14, height: 14 }}
+                      />
+                    </td>
+                  )}
                   <td style={{ padding: "8px 10px", fontSize: 12, fontWeight: 600, color: "#192943" }}>{l.name}</td>
                   <td style={{ padding: "8px 10px", fontSize: 12, color: "#5e708d" }}>{l.business ?? "—"}</td>
                   <td style={{ padding: "8px 10px", fontSize: 12, color: "#5e708d" }}>{l.email}</td>
@@ -1295,12 +1398,22 @@ export default function Leads() {
           return (
             <div
               key={l.id}
-              className={`lead-card${isSelected ? " lead-card-selected" : ""}`}
+              className={`lead-card${isSelected ? " lead-card-selected" : ""}${checkedIds.has(l.id) ? " lead-card-checked" : ""}`}
               style={{ borderLeftColor: meta?.color ?? "#5e708d" }}
               onClick={() => setSelected(l)}
             >
               <div className="lead-card-top">
-                <div style={{ minWidth: 0 }}>
+                {showCreatedBy && (
+                  <div onClick={e => toggleCheck(l.id, e)} style={{ display: "flex", alignItems: "center", marginRight: 8, flexShrink: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={checkedIds.has(l.id)}
+                      onChange={() => {}}
+                      style={{ cursor: "pointer", accentColor: "#118849", width: 16, height: 16 }}
+                    />
+                  </div>
+                )}
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "#192943", marginBottom: 2 }}>{l.name}</div>
                   {l.business && <div style={{ fontSize: 12, color: "#5e708d", marginBottom: 2 }}>{l.business}</div>}
                   <div style={{ fontSize: 12, color: "#5e708d", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.email}</div>
