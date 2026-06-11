@@ -22,6 +22,7 @@ async function runMigrations() {
   const stmts = [
     "ALTER TABLE `user` ADD COLUMN `manager_id` VARCHAR(191) NULL",
     "ALTER TABLE `lead` ADD COLUMN `created_by` VARCHAR(191) NULL",
+    "ALTER TABLE `lead` ADD COLUMN `assigned_to` VARCHAR(191) NULL",
     "ALTER TABLE `user` ADD COLUMN `permissions` VARCHAR(1000) NULL",
     `CREATE TABLE IF NOT EXISTS \`activity_log\` (
       \`id\` VARCHAR(191) NOT NULL PRIMARY KEY,
