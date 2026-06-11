@@ -226,16 +226,10 @@ app.get("/users/agents", async (c) => {
   const u = c.get("user")!;
   let agents;
   if (u.role === "admin") {
-    // Admins see all agents (their own team + agents without a manager assigned)
+    // Admins see all agents so that any agent with assigned leads is visible in dropdowns/filters
     agents = await db().select({ id: schema.user.id, name: schema.user.name, role: schema.user.role })
       .from(schema.user)
-      .where(
-        or(
-          eq(schema.user.managerId, u.id),
-          isNull(schema.user.managerId)
-        )
-      )
-      .then(rows => rows.filter(r => r.role === "agent"));
+      .where(eq(schema.user.role, "agent"));
   } else {
     agents = await db().select({ id: schema.user.id, name: schema.user.name, role: schema.user.role })
       .from(schema.user)
