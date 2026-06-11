@@ -11,6 +11,7 @@ const NAV = [
   { path: "/activity-log", label: "Activity Log", icon: "📋", roles: ["super_admin", "admin"] },
   { path: "/media", label: "Media Library", icon: "🖼️", roles: ["super_admin", "admin", "agent"] },
   { path: "/email-campaign", label: "Email Campaign", icon: "✉️", roles: ["super_admin", "admin", "agent"] },
+  { path: "/manual-email-templates", label: "Agent Email Templates", icon: "📝", roles: ["super_admin", "admin"] },
   { path: "/signups", label: "Signups Tracker", icon: "📈", roles: ["super_admin", "admin", "agent"] },
   { path: "/subscriptions", label: "Subscriptions", icon: "💳", roles: ["super_admin", "admin"] },
   { path: "/email-log", label: "Email Log", icon: "📨", roles: ["super_admin", "admin"] },
