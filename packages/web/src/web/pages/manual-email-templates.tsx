@@ -16,6 +16,7 @@ const STAGES = [
 
 export default function ManualEmailTemplates() {
   const [templates, setTemplates] = useState<Record<string, { subject: string; bodyHtml: string }>>({});
+  const [defaults, setDefaults]   = useState<Record<string, { subject: string; html: string }>>({});
   const [edits, setEdits]         = useState<Record<string, { subject: string; bodyHtml: string }>>({});
   const [fetching, setFetching]   = useState(true);
   const [saving, setSaving]       = useState<Record<string, boolean>>({});
@@ -33,15 +34,23 @@ export default function ManualEmailTemplates() {
 
   const load = () => {
     setFetching(true);
-    api.get("/email/templates").then(r => r.json()).then(d => {
+    Promise.all([
+      api.get("/email/templates").then(r => r.json()),
+      api.get("/email/templates/defaults").then(r => r.json()),
+    ]).then(([tplData, defData]) => {
       const tplMap: Record<string, { subject: string; bodyHtml: string }> = {};
-      for (const t of (d.templates ?? [])) {
+      for (const t of (tplData.templates ?? [])) {
         tplMap[t.stageId] = { subject: t.subject, bodyHtml: t.bodyHtml };
       }
+      const defMap: Record<string, { subject: string; html: string }> = {};
+      for (const d of (defData.defaults ?? [])) {
+        defMap[d.stageId] = { subject: d.subject, html: d.html };
+      }
       setTemplates(tplMap);
+      setDefaults(defMap);
       const init: Record<string, { subject: string; bodyHtml: string }> = {};
       for (const s of STAGES) {
-        init[s.value] = tplMap[s.value] ?? { subject: "", bodyHtml: "" };
+        init[s.value] = tplMap[s.value] ?? { subject: defMap[s.value]?.subject ?? "", bodyHtml: "" };
       }
       setEdits(init);
       setFetching(false);
@@ -218,18 +227,28 @@ export default function ManualEmailTemplates() {
             </div>
             <div className="mt-modal-body">
               {modal.tab === "preview" ? (
-                modalEdit.bodyHtml ? (
-                  <iframe
-                    srcDoc={modalEdit.bodyHtml}
-                    style={{ width:"100%", minHeight:400, border:"none" }}
-                    title="Email preview"
-                  />
-                ) : (
-                  <div style={{ padding:40, textAlign:"center", color:"#9eafc2", fontSize:14 }}>
-                    No custom template saved yet — the default hardcoded email will be sent.<br />
-                    <span style={{ fontSize:12 }}>Use the Edit tab to create a custom one.</span>
-                  </div>
-                )
+                (() => {
+                  const previewHtml = modalEdit.bodyHtml || defaults[modal.stageValue]?.html || "";
+                  const isDefault = !modalEdit.bodyHtml && !!defaults[modal.stageValue]?.html;
+                  return previewHtml ? (
+                    <div style={{ display:"flex", flexDirection:"column", height:"100%" }}>
+                      {isDefault && (
+                        <div style={{ padding:"8px 16px", background:"#fff8e1", borderBottom:"1px solid #fcd34d", fontSize:12, color:"#92400e", flexShrink:0 }}>
+                          ⚠ Showing <strong>default</strong> email — no custom version saved yet. Use the Edit tab to customise it.
+                        </div>
+                      )}
+                      <iframe
+                        srcDoc={previewHtml}
+                        style={{ width:"100%", flex:1, minHeight:400, border:"none" }}
+                        title="Email preview"
+                      />
+                    </div>
+                  ) : (
+                    <div style={{ padding:40, textAlign:"center", color:"#9eafc2", fontSize:14 }}>
+                      No preview available.
+                    </div>
+                  );
+                })()
               ) : (
                 <>
                   <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 12px", borderBottom:"1px solid #eef2f6", flexShrink:0 }}>

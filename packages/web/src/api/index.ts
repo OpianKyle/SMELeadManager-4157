@@ -1157,6 +1157,24 @@ app.post("/leads/bulk", async (c) => {
 });
 
 // ── Email Templates ───────────────────────────────────────────────────
+app.get("/email/templates/defaults", async (c) => {
+  const err = requireAuth(c);
+  if (err) return err;
+  const PLACEHOLDER_NAME = "{{name}}";
+  const PLACEHOLDER_BUSINESS = "{{business}}";
+  const defaults = [
+    { stageId: "attempt1",            ...attempt1Email(PLACEHOLDER_NAME) },
+    { stageId: "attempt2",            ...attempt2Email(PLACEHOLDER_NAME) },
+    { stageId: "final_attempt",       ...finalAttemptEmail(PLACEHOLDER_NAME) },
+    { stageId: "callback_confirm",    ...callbackConfirmEmail(PLACEHOLDER_NAME, "{{demoDate}}", "", "{{phone}}") },
+    { stageId: "reminder24",          ...onboardingReminderEmail(PLACEHOLDER_NAME, "{{demoDate}}", "", "{{phone}}", 24) },
+    { stageId: "reminder1",           ...onboardingReminderEmail(PLACEHOLDER_NAME, "{{demoDate}}", "", "{{phone}}", 1) },
+    { stageId: "missed_appt",         ...missedAppointmentEmail(PLACEHOLDER_NAME, "{{demoDate}}") },
+    { stageId: "onboarding_complete", ...onboardingCompleteEmail(PLACEHOLDER_NAME) },
+  ];
+  return c.json({ defaults }, 200);
+});
+
 app.get("/email/templates", async (c) => {
   const err = requireAuth(c);
   if (err) return err;
