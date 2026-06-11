@@ -866,13 +866,6 @@ export default function Leads() {
     });
   };
 
-  const allFilteredChecked = filtered.length > 0 && filtered.every(l => checkedIds.has(l.id));
-
-  const toggleAllFiltered = () => {
-    if (allFilteredChecked) setCheckedIds(new Set());
-    else setCheckedIds(new Set(filtered.map(l => l.id)));
-  };
-
   const bulkAssign = async () => {
     if (!bulkAgentId || checkedIds.size === 0) return;
     setBulkAssigning(true);
@@ -914,6 +907,13 @@ export default function Leads() {
         : l.assignedTo === agentFilter;
     return matchSearch && matchStage && matchAgent;
   });
+
+  const allFilteredChecked = filtered.length > 0 && filtered.every(l => checkedIds.has(l.id));
+
+  const toggleAllFiltered = () => {
+    if (allFilteredChecked) setCheckedIds(new Set());
+    else setCheckedIds(new Set(filtered.map(l => l.id)));
+  };
 
   const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage    = Math.min(page, totalPages);
