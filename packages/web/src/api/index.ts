@@ -645,6 +645,26 @@ async function maybeSendStage5(leadId: string) {
   }
 }
 
+// ── Bulk assign leads ─────────────────────────────────────────────────
+// Must be defined BEFORE app.put("/leads/:id") so Hono doesn't swallow it as id="bulk-assign"
+app.put("/leads/bulk-assign", async (c) => {
+  const err = requireRole(c, ["super_admin", "admin"]);
+  if (err) return err;
+  const u = c.get("user")!;
+  const { leadIds, agentId } = await c.req.json() as { leadIds: string[]; agentId: string | null };
+  if (!Array.isArray(leadIds) || leadIds.length === 0) {
+    return c.json({ error: "leadIds array required" }, 400);
+  }
+  const [agent] = agentId
+    ? await db().select({ name: schema.user.name }).from(schema.user).where(eq(schema.user.id, agentId))
+    : [null];
+  await db().update(schema.lead)
+    .set({ assignedTo: agentId ?? null, updatedAt: new Date() })
+    .where(inArray(schema.lead.id, leadIds));
+  logActivity({ user: u, action: "leads_bulk_assigned", entity: "lead", details: { count: leadIds.length, agentId, agentName: agent?.name ?? null } });
+  return c.json({ success: true, count: leadIds.length }, 200);
+});
+
 app.put("/leads/:id", async (c) => {
   const err = requireRole(c, ["super_admin", "admin", "agent"]);
   if (err) return err;
@@ -678,25 +698,6 @@ app.delete("/leads/:id", async (c) => {
   await db().delete(schema.lead).where(eq(schema.lead.id, lid));
   logActivity({ user: u, action: "lead_deleted", entity: "lead", entityId: lid, details: { name: target?.name, email: target?.email } });
   return c.json({ success: true }, 200);
-});
-
-// ── Bulk assign leads ─────────────────────────────────────────────────
-app.put("/leads/bulk-assign", async (c) => {
-  const err = requireRole(c, ["super_admin", "admin"]);
-  if (err) return err;
-  const u = c.get("user")!;
-  const { leadIds, agentId } = await c.req.json() as { leadIds: string[]; agentId: string | null };
-  if (!Array.isArray(leadIds) || leadIds.length === 0) {
-    return c.json({ error: "leadIds array required" }, 400);
-  }
-  const [agent] = agentId
-    ? await db().select({ name: schema.user.name }).from(schema.user).where(eq(schema.user.id, agentId))
-    : [null];
-  await db().update(schema.lead)
-    .set({ assignedTo: agentId ?? null, updatedAt: new Date() })
-    .where(inArray(schema.lead.id, leadIds));
-  logActivity({ user: u, action: "leads_bulk_assigned", entity: "lead", details: { count: leadIds.length, agentId, agentName: agent?.name ?? null } });
-  return c.json({ success: true, count: leadIds.length }, 200);
 });
 
 // ── Email Send ────────────────────────────────────────────────────────
