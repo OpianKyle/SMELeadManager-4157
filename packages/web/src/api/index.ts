@@ -379,6 +379,10 @@ app.delete("/users/:id", async (c) => {
   const currentUser = c.get("user");
   if (id === currentUser?.id) return c.json({ error: "Cannot delete yourself" }, 400);
   const [target] = await db().select().from(schema.user).where(eq(schema.user.id, id));
+  if (!target) return c.json({ error: "User not found" }, 404);
+  // Clear FK references before deleting so constraints don't block the delete
+  await db().update(schema.lead).set({ assignedTo: null }).where(eq(schema.lead.assignedTo, id));
+  await db().update(schema.user).set({ managerId: null }).where(eq(schema.user.managerId, id));
   await db().delete(schema.user).where(eq(schema.user.id, id));
   logActivity({ user: currentUser, action: "user_deleted", entity: "user", entityId: id, details: { name: target?.name, email: target?.email } });
   return c.json({ success: true }, 200);

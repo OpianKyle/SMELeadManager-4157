@@ -32,7 +32,9 @@ async function loadApp(server: ViteDevServer) {
 }
 
 function toWebRequest(req: import("http").IncomingMessage): Request {
-  const url = new URL(req.url!, `http://${req.headers.host}`);
+  const host = (req.headers["x-forwarded-host"] as string | undefined) || req.headers.host || "localhost";
+  const proto = (req.headers["x-forwarded-proto"] as string | undefined)?.split(",")[0].trim() || "http";
+  const url = new URL(req.url!, `${proto}://${host}`);
   const headers = new Headers();
   for (const [key, val] of Object.entries(req.headers)) {
     if (val) headers.set(key, Array.isArray(val) ? val.join(", ") : val);
