@@ -904,7 +904,7 @@ export default function Leads() {
       ? true
       : agentFilter === "unassigned"
         ? !l.assignedTo
-        : l.assignedTo === agentFilter;
+        : l.assignedTo === agentFilter || (l.createdBy === agentFilter && !l.assignedTo);
     return matchSearch && matchStage && matchAgent;
   });
 
