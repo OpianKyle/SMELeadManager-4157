@@ -455,6 +455,65 @@ app.post("/users/:id/send-reset", async (c) => {
   }
 });
 
+// ── Forgot password (self-service) ───────────────────────────────────
+app.post("/forgot-password", async (c) => {
+  const { email } = await c.req.json();
+  if (!email) return c.json({ error: "email required" }, 400);
+
+  // Look up user – always return success so we don't reveal whether an email exists
+  const [target] = await db().select().from(schema.user).where(eq(schema.user.email, email));
+  if (!target) return c.json({ success: true }, 200);
+
+  const baseURL = new URL(c.req.url).origin;
+  try {
+    const token = crypto.randomUUID().replace(/-/g, "").slice(0, 24);
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await db().insert(schema.verification).values({
+      id: crypto.randomUUID(),
+      identifier: `reset-password:${token}`,
+      value: target.id,
+      expiresAt,
+    });
+    const resetUrl = `${baseURL}/reset-password?token=${token}`;
+    await sendEmail({
+      to: target.email,
+      subject: "Reset your Masakhe Lead Manager password",
+      html: `
+        <div style="font-family:'Open Sans',Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;">
+          <div style="background:#0f326b;border-radius:3px;padding:20px 24px;margin-bottom:24px;">
+            <p style="font-family:'Open Sans',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;margin:0;">Masakhe Lead Manager</p>
+          </div>
+          <h2 style="color:#0f326b;margin:0 0 16px;">Reset your password</h2>
+          <p style="color:#192943;font-size:14px;line-height:1.6;margin:0 0 24px;">
+            Hi ${target.name || target.email},<br><br>
+            We received a request to reset your password.
+            Click the button below to choose a new password.
+            This link expires in 1 hour.
+          </p>
+          <a href="${resetUrl}" style="
+            display:inline-block;background:#118849;color:#ffffff;
+            font-size:14px;font-weight:700;text-decoration:none;
+            padding:13px 28px;border-radius:3px;
+          ">Reset Password →</a>
+          <p style="color:#9eafc2;font-size:11px;margin:10px 0 0;line-height:1.5;">
+            ⚠️ This link can only be used once and expires in 1 hour.
+          </p>
+          <p style="color:#5e708d;font-size:12px;margin:24px 0 0;line-height:1.5;">
+            If you did not request a password reset, you can safely ignore this email.
+          </p>
+          <p style="color:#9eafc2;font-size:11px;margin:16px 0 0;">
+            © ${new Date().getFullYear()} Masakhe Group (Pty) Ltd
+          </p>
+        </div>
+      `,
+    });
+  } catch (e: any) {
+    console.error("[forgot-password] Failed to send reset email:", e?.message);
+    return c.json({ error: "Failed to send reset email" }, 500);
+  }
+  return c.json({ success: true }, 200);
+});
+
 // ── Subscriptions (proxy to masakheportal.co.za) ─────────────────────
 app.get("/subscriptions", async (c) => {
   const err = requireAuth(c);
@@ -489,16 +548,20 @@ app.get("/leads", async (c) => {
 
   let leads;
   if (u.role === "agent") {
+    // Agent sees leads they created OR leads assigned to them
     leads = await db().select().from(schema.lead)
-      .where(eq(schema.lead.createdBy, u.id))
+      .where(or(eq(schema.lead.createdBy, u.id), eq(schema.lead.assignedTo, u.id)))
       .orderBy(desc(schema.lead.createdAt));
   } else if (u.role === "admin") {
-    // Distributor sees their own leads + all their agents' leads
+    // Distributor sees leads created by or assigned to themselves or any of their agents
     const agentRows = await db().select({ id: schema.user.id }).from(schema.user)
       .where(eq(schema.user.managerId, u.id));
     const scopeIds = [u.id, ...agentRows.map(a => a.id)];
     leads = await db().select().from(schema.lead)
-      .where(inArray(schema.lead.createdBy, scopeIds))
+      .where(or(
+        inArray(schema.lead.createdBy, scopeIds),
+        inArray(schema.lead.assignedTo, scopeIds)
+      ))
       .orderBy(desc(schema.lead.createdAt));
   } else {
     leads = await db().select().from(schema.lead).orderBy(desc(schema.lead.createdAt));

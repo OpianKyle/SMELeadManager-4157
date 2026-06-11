@@ -34,12 +34,14 @@ export default function SignIn() {
     setLoading(true);
     setError("");
     try {
-      const res = await authClient.forgetPassword({
-        email,
-        redirectTo: "/reset-password",
+      const res = await fetch("/api/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
-      if (res.error) {
-        setError(res.error.message ?? "Could not send reset email");
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Could not send reset email");
       } else {
         setView("forgot-sent");
       }
