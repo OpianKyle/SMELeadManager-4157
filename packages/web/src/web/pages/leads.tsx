@@ -873,10 +873,10 @@ export default function Leads() {
     const res = await api.put("/leads/bulk-assign", { leadIds: [...checkedIds], agentId: bulkAgentId });
     const data = await res.json();
     if (data.success) {
-      setLeads(prev => prev.map(l => checkedIds.has(l.id) ? { ...l, assignedTo: bulkAgentId, assignedToName: agentName } : l));
       showToast(`✅ Assigned ${checkedIds.size} lead${checkedIds.size !== 1 ? "s" : ""} to ${agentName}`);
       setCheckedIds(new Set());
       setBulkAgentId("");
+      load();
     } else {
       showToast("❌ " + (data.error ?? "Failed to assign"));
     }
@@ -1211,7 +1211,8 @@ export default function Leads() {
             onChange={e => setBulkAgentId(e.target.value)}
             style={{
               padding: "6px 10px", borderRadius: 3, border: "none", fontSize: 13,
-              fontFamily: "'Open Sans',Arial,sans-serif", color: "#192943",
+              fontFamily: "'Open Sans',Arial,sans-serif", color: "#fff",
+              background: "rgba(255,255,255,0.15)",
             }}
           >
             <option value="">— Select agent to assign —</option>
